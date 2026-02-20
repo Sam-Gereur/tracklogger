@@ -427,47 +427,116 @@
     z-index: 300;
     white-space: nowrap;
   }
-  /* Car profile list items */
-  .profile-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
+  /* Car profile cards */
+  .profile-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
   }
-  .profile-item:last-child { border-bottom: none; }
-  .profile-item-info { flex: 1; min-width: 0; }
-  .profile-item-name {
+  .profile-card:last-child { margin-bottom: 0; }
+  .profile-card:hover { border-color: var(--accent); background: #1a1a1a; }
+  .profile-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .profile-card-name {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: 900;
+    font-size: 1.1rem;
     letter-spacing: 1px;
     color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
-  .profile-item-sub {
+  .profile-card-sub {
     font-size: 0.72rem;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 3px;
   }
-  .profile-item-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: 10px; }
+  .profile-card-chevron {
+    color: var(--muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: transform 0.2s;
+  }
+  .profile-card.expanded .profile-card-chevron { transform: rotate(90deg); }
+
+  .profile-card-details {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .profile-card.expanded .profile-card-details { display: block; }
+
+  .profile-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.82rem;
+  }
+  .profile-detail-row:last-child { border-bottom: none; }
+  .profile-dk { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.5px; }
+  .profile-dv { color: var(--text); font-weight: 500; text-align: right; }
+
+  .profile-note-text {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: 3px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    border-left: 2px solid var(--accent);
+  }
+
+  .profile-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
   .profile-edit-btn {
+    flex: 1;
     background: none;
     border: 1px solid var(--border);
     color: var(--muted);
     border-radius: 3px;
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
-    padding: 4px 8px;
+    padding: 8px;
     cursor: pointer;
     transition: all 0.15s;
+    text-align: center;
   }
   .profile-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .profile-del-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .profile-del-btn:hover { border-color: #ff4d4d; color: #ff4d4d; }
 
   /* Color picker */
   .color-picker-row {
@@ -536,6 +605,129 @@
     text-align: center;
     padding: 10px 0;
   }
+
+  /* Stats & AI tabs */
+  .stats-tabs {
+    display: flex;
+    padding: 10px 12px 0;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+  }
+  .stats-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .stats-panel { display: none; }
+  .stats-panel.active { display: block; }
+  .ai-panel { display: none; }
+  .ai-panel.active { display: block; }
+
+  /* Personal Bests */
+  .bests-track-section { margin: 12px; margin-bottom: 16px; background: var(--surface); border-radius: 6px; padding: 12px; }
+  .bests-track-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bests-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 0.82rem;
+  }
+  .bests-label { color: var(--muted); font-size: 0.72rem; }
+  .bests-val { color: var(--text); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .bests-val.gold { color: var(--accent); }
+
+  /* Delta view */
+  .delta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    gap: 8px;
+  }
+  .delta-row:last-child { border-bottom: none; }
+  .delta-label { color: var(--muted); font-size: 0.72rem; flex: 1.2; }
+  .delta-a-val, .delta-b-val { flex: 1; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .delta-diff { flex: 0 0 52px; text-align: right; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 0.82rem; }
+  .delta-diff.better { color: #00cc66; }
+  .delta-diff.worse  { color: #ff4d4d; }
+  .delta-diff.same   { color: var(--muted); }
+  .delta-section-hdr {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    padding: 12px 0 4px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+  .delta-col-hdr {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0 2px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 2px;
+  }
+  .delta-col-hdr span { flex: 1; text-align: center; }
+  .delta-col-hdr span:first-child { flex: 1.2; text-align: left; }
+  .delta-col-hdr span:last-child { flex: 0 0 52px; text-align: right; }
+
+  /* Best vs Latest */
+  .bvl-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 4px;
+  }
+  .bvl-hdr {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 6px 0;
+    border-bottom: 2px solid var(--accent);
+  }
+  .bvl-hdr:nth-child(2), .bvl-hdr:nth-child(3) { text-align: center; }
+  .bvl-row { display: contents; }
+  .bvl-cell {
+    padding: 7px 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bvl-cell.key { color: var(--muted); font-size: 0.72rem; }
+  .bvl-cell.val { text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; }
+  .bvl-cell.accent { color: var(--accent); }
 
   /* Cheat Sheet page */
   #page-cheat { padding: 12px 0; }
@@ -725,6 +917,83 @@
   }
   .compare-table .no-data { color: var(--muted); font-style: italic; }
 
+  /* AI Debrief */
+  .btn-ai {
+    flex: 1;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .btn-ai:hover { background: rgba(232,255,0,0.1); }
+
+  .debrief-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 0;
+  }
+  .debrief-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .debrief-section {
+    margin-bottom: 16px;
+  }
+  .debrief-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .debrief-text {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .debrief-item {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .debrief-item:last-child { border-bottom: none; }
+  .debrief-bullet {
+    color: var(--accent);
+    font-weight: 900;
+    flex-shrink: 0;
+    font-size: 1rem;
+    margin-top: 1px;
+  }
+  .debrief-error {
+    color: #ff4d4d;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.6;
+  }
+
   /* Calendar picker */
   .cal-trigger {
     width: 100%;
@@ -844,15 +1113,15 @@
   </button>
   <button class="nav-btn" id="nav-history" onclick="showPage('history')">
     <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
-    <span class="nav-label">Session</span>
+    <span class="nav-label">Sessions</span>
   </button>
-  <button class="nav-btn" id="nav-compare" onclick="showPage('compare')">
+  <button class="nav-btn" id="nav-stats" onclick="showPage('stats')">
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    <span class="nav-label">Compare</span>
+    <span class="nav-label">Stats</span>
   </button>
-  <button class="nav-btn" id="nav-cheat" onclick="showPage('cheat')">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    <span class="nav-label">Cheat</span>
+  <button class="nav-btn" id="nav-ai" onclick="showPage('ai')">
+    <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    <span class="nav-label">AI</span>
   </button>
   <button class="nav-btn" id="nav-setup" onclick="showPage('setup')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1055,84 +1324,111 @@
   <div id="history-list"></div>
 </div>
 
-<!-- COMPARE PAGE -->
-<div class="page" id="page-compare">
-  <div class="compare-filters" id="compare-filters"></div>
-  <div class="compare-wrap">
-    <table class="compare-table" id="compare-table">
-      <thead id="compare-thead"></thead>
-      <tbody id="compare-tbody"></tbody>
-    </table>
+<!-- STATS PAGE -->
+<div class="page" id="page-stats">
+  <div class="stats-tabs">
+    <button class="stats-tab active" onclick="switchStatsTab('bests', this)">Bests</button>
+    <button class="stats-tab" onclick="switchStatsTab('chart', this)">Chart</button>
+    <button class="stats-tab" onclick="switchStatsTab('compare', this)">Compare</button>
+    <button class="stats-tab" onclick="switchStatsTab('delta', this)">Delta</button>
   </div>
-  <div class="empty-state" id="compare-empty" style="display:none;">
-    <div class="big">📊</div>
-    <p>No sessions logged yet.<br>Log sessions to compare them here.</p>
+  <div class="stats-panel active" id="stats-bests"><div id="bests-content"></div></div>
+  <div class="stats-panel" id="stats-chart">
+    <div class="field" style="padding:12px 12px 0;">
+      <label>Track</label>
+      <select id="chart-track-sel" onchange="renderChart()"><option value="">— Select Track —</option></select>
+    </div>
+    <canvas id="lap-chart" style="padding:12px;width:100%;box-sizing:border-box;" height="220"></canvas>
+    <div id="chart-empty" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">No sessions for this track yet</div>
+  </div>
+  <div class="stats-panel" id="stats-compare">
+    <div class="compare-filters" id="compare-filters"></div>
+    <div class="compare-wrap">
+      <table class="compare-table" id="compare-table">
+        <thead id="compare-thead"></thead>
+        <tbody id="compare-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="stats-panel" id="stats-delta">
+    <div style="padding:12px 12px 0;display:flex;gap:8px;">
+      <div class="field" style="flex:1;margin:0;"><label>Session A</label><select id="delta-a" onchange="renderDelta()"><option value="">— Select —</option></select></div>
+      <div class="field" style="flex:1;margin:0;"><label>Session B</label><select id="delta-b" onchange="renderDelta()"><option value="">— Select —</option></select></div>
+    </div>
+    <div id="delta-content" style="padding:12px;"></div>
   </div>
 </div>
 
-<!-- CHEAT SHEET PAGE -->
-<div class="page" id="page-cheat">
-  <div class="cheat-intro">Adjust clicks relative to your current baseline. ↑ = stiffer &nbsp;·&nbsp; ↓ = softer &nbsp;·&nbsp; ↔ = no change</div>
-  <div class="cheat-wrap">
-    <table class="cheat-table">
-      <thead>
-        <tr>
-          <th>Situation / Problem</th>
-          <th>F. Reb</th>
-          <th>R. Reb</th>
-          <th>F. Comp</th>
-          <th>R. Comp</th>
-          <th>Why</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="cheat-group-us">
-          <td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — entry</td>
-          <td class="cheat-down">↓ 2-3</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-neutral">↔</td>
-          <td class="cheat-why">More weight on front sooner</td>
-        </tr>
-        <tr class="cheat-group-us">
-          <td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — mid-corner</td>
-          <td class="cheat-neutral">↔</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-up">↑ 1-2</td>
-          <td class="cheat-why">More front grip, reduce rear hold</td>
-        </tr>
-        <tr class="cheat-group-us">
-          <td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — exit</td>
-          <td class="cheat-down">↓ 2</td><td class="cheat-neutral">↔</td><td class="cheat-down">↓ 1</td><td class="cheat-up">↑ 1</td>
-          <td class="cheat-why">Helps front traction under throttle</td>
-        </tr>
-        <tr class="cheat-group-os">
-          <td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — entry</td>
-          <td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 2-3</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td>
-          <td class="cheat-why">Keep rear settled under braking</td>
-        </tr>
-        <tr class="cheat-group-os">
-          <td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — mid-corner</td>
-          <td class="cheat-neutral">↔</td><td class="cheat-down">↓ 1-2</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 1</td>
-          <td class="cheat-why">Soften rear grip for balance</td>
-        </tr>
-        <tr class="cheat-group-os">
-          <td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — exit</td>
-          <td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 2</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 1</td>
-          <td class="cheat-why">Discourage rear dive/snap under power</td>
-        </tr>
-        <tr>
-          <td class="cheat-situation"><span class="cheat-badge other">⚡</span>High-speed instability</td>
-          <td class="cheat-up">↑ 1</td><td class="cheat-up">↑ 1</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td>
-          <td class="cheat-why">Adds stability front &amp; rear</td>
-        </tr>
-        <tr>
-          <td class="cheat-situation"><span class="cheat-badge other">⚡</span>Harsh bumps / curbs</td>
-          <td class="cheat-down">↓ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-down">↓ 2-3</td><td class="cheat-down">↓ 2-3</td>
-          <td class="cheat-why">Soaks up rough surfaces</td>
-        </tr>
-        <tr>
-          <td class="cheat-situation"><span class="cheat-badge other">⚡</span>Track very smooth</td>
-          <td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td>
-          <td class="cheat-why">Keep near baseline</td>
-        </tr>
-      </tbody>
-    </table>
+<!-- AI PAGE -->
+<div class="page" id="page-ai">
+  <div class="stats-tabs">
+    <button class="stats-tab active" onclick="switchAiTab('advisor', this)">Advisor</button>
+    <button class="stats-tab" onclick="switchAiTab('trends', this)">Trends</button>
+    <button class="stats-tab" onclick="switchAiTab('autofill', this)">Auto-fill</button>
+    <button class="stats-tab" onclick="switchAiTab('cheat', this)">Cheat</button>
+  </div>
+
+  <div class="ai-panel active" id="ai-advisor">
+    <div style="padding:12px;">
+      <div class="field">
+        <label>Describe your handling problem</label>
+        <textarea id="advisor-problem" rows="4" placeholder="e.g. The car understeers heavily on entry into slow corners and snaps to oversteer mid-corner..."></textarea>
+      </div>
+      <div class="field">
+        <label>Current coilover clicks (optional)</label>
+        <div class="grid-2">
+          <div class="field" style="margin:0;"><label>F. Comp</label><input type="number" id="adv-fcomp" placeholder="16"></div>
+          <div class="field" style="margin:0;"><label>F. Reb</label><input type="number" id="adv-freb" placeholder="16"></div>
+          <div class="field" style="margin:0;"><label>R. Comp</label><input type="number" id="adv-rcomp" placeholder="16"></div>
+          <div class="field" style="margin:0;"><label>R. Reb</label><input type="number" id="adv-rreb" placeholder="16"></div>
+        </div>
+      </div>
+      <button class="btn-ai" style="width:100%;margin-top:4px;" onclick="runAdvisor()">✦ GET RECOMMENDATIONS</button>
+      <div id="advisor-result" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="ai-panel" id="ai-trends">
+    <div style="padding:12px;">
+      <div class="field">
+        <label>Track to analyse (last 3 sessions)</label>
+        <select id="trends-track-sel"><option value="">— Select Track —</option></select>
+      </div>
+      <button class="btn-ai" style="width:100%;margin-top:4px;" onclick="runTrends()">✦ ANALYSE TRENDS</button>
+      <div id="trends-result" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="ai-panel" id="ai-autofill">
+    <div style="padding:12px;">
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6;margin-bottom:12px;">Select a session and AI will suggest what to write in "Changes for Next Session" based on the handling data and notes.</p>
+      <div class="field">
+        <label>Session</label>
+        <select id="autofill-session-sel"><option value="">— Select Session —</option></select>
+      </div>
+      <button class="btn-ai" style="width:100%;margin-top:4px;" onclick="runAutofill()">✦ GENERATE CHANGES</button>
+      <div id="autofill-result" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="ai-panel" id="ai-cheat">
+    <div class="cheat-intro">Adjust clicks relative to your current baseline. ↑ = stiffer &nbsp;·&nbsp; ↓ = softer &nbsp;·&nbsp; ↔ = no change</div>
+    <div class="cheat-wrap">
+      <table class="cheat-table">
+        <thead><tr><th>Situation / Problem</th><th>F. Reb</th><th>R. Reb</th><th>F. Comp</th><th>R. Comp</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr class="cheat-group-us"><td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — entry</td><td class="cheat-down">↓ 2-3</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-neutral">↔</td><td class="cheat-why">More weight on front sooner</td></tr>
+          <tr class="cheat-group-us"><td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — mid-corner</td><td class="cheat-neutral">↔</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-up">↑ 1-2</td><td class="cheat-why">More front grip, reduce rear hold</td></tr>
+          <tr class="cheat-group-us"><td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — exit</td><td class="cheat-down">↓ 2</td><td class="cheat-neutral">↔</td><td class="cheat-down">↓ 1</td><td class="cheat-up">↑ 1</td><td class="cheat-why">Helps front traction under throttle</td></tr>
+          <tr class="cheat-group-os"><td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — entry</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 2-3</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-why">Keep rear settled under braking</td></tr>
+          <tr class="cheat-group-os"><td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — mid-corner</td><td class="cheat-neutral">↔</td><td class="cheat-down">↓ 1-2</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 1</td><td class="cheat-why">Soften rear grip for balance</td></tr>
+          <tr class="cheat-group-os"><td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — exit</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 2</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 1</td><td class="cheat-why">Discourage rear dive/snap under power</td></tr>
+          <tr><td class="cheat-situation"><span class="cheat-badge other">⚡</span>High-speed instability</td><td class="cheat-up">↑ 1</td><td class="cheat-up">↑ 1</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-why">Adds stability front &amp; rear</td></tr>
+          <tr><td class="cheat-situation"><span class="cheat-badge other">⚡</span>Harsh bumps / curbs</td><td class="cheat-down">↓ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-down">↓ 2-3</td><td class="cheat-down">↓ 2-3</td><td class="cheat-why">Soaks up rough surfaces</td></tr>
+          <tr><td class="cheat-situation"><span class="cheat-badge other">⚡</span>Track very smooth</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-why">Keep near baseline</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -1209,16 +1505,16 @@
       <div class="grid-2">
         <div class="field">
           <label>Spring Rate Front</label>
-          <input type="text" id="p-spring-f" placeholder="8 kg/mm">
+          <input type="text" id="p-spring-f" placeholder="450 lbs/in">
         </div>
         <div class="field">
           <label>Spring Rate Rear</label>
-          <input type="text" id="p-spring-r" placeholder="6 kg/mm">
+          <input type="text" id="p-spring-r" placeholder="350 lbs/in">
         </div>
       </div>
       <div class="field">
-        <label>Weight (kg)</label>
-        <input type="number" id="p-weight" placeholder="1250">
+        <label>Weight (lbs)</label>
+        <input type="number" id="p-weight" placeholder="2756">
       </div>
       <div class="field">
         <label>Note</label>
@@ -1276,6 +1572,19 @@
     <button class="btn-primary" style="margin-top:8px;" onclick="saveAccentColor()">SAVE COLOR</button>
   </div>
 
+  <div class="card">
+    <div class="section-label">AI Debrief</div>
+    <div class="field">
+      <label>Anthropic API Key</label>
+      <input type="password" id="s-api-key" placeholder="AIza..." oninput="saveApiKey(this.value)">
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:6px;line-height:1.5;">Get your free key at <strong style="color:var(--text)">aistudio.google.com</strong> → Get API Key. No credit card needed. Stored locally on your device only.</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="btn-primary" style="margin-top:0;flex:1;" onclick="testApiKey()">TEST API KEY</button>
+      <div id="api-test-status" style="font-size:0.8rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;"></div>
+    </div>
+  </div>
+
   <button class="btn-primary" onclick="saveSetup()">SAVE SETUP</button>
 </div>
 
@@ -1289,6 +1598,24 @@
     <div id="modal-body"></div>
     <div style="margin-top:16px;display:flex;gap:10px;">
       <button class="btn-danger" onclick="deleteCurrentSession()">DELETE SESSION</button>
+      <button class="btn-ai" onclick="runDebrief()">✦ AI DEBRIEF</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Debrief Modal -->
+<div class="modal-overlay" id="debrief-overlay">
+  <div class="modal" id="debrief-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">✦ AI Debrief</div>
+      <button class="close-btn" onclick="closeDebrief()">✕</button>
+    </div>
+    <div id="debrief-body">
+      <div class="debrief-loading" id="debrief-loading">
+        <div class="debrief-spinner"></div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:12px;">Analysing session...</div>
+      </div>
+      <div id="debrief-result" style="display:none;"></div>
     </div>
   </div>
 </div>
@@ -1309,10 +1636,12 @@ function showPage(page) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.getElementById('nav-' + page).classList.add('active');
-  document.getElementById('header-title').textContent = page === 'log' ? 'New Session' : page === 'history' ? 'Sessions' : page === 'compare' ? 'Compare' : page === 'cheat' ? 'Cheat Sheet' : 'Setup';
+  const titles = { log: 'New Session', history: 'Sessions', stats: 'Stats', ai: 'AI', setup: 'Setup' };
+  document.getElementById('header-title').textContent = titles[page] || page;
   if (page === 'history') renderHistory();
   if (page === 'setup') loadSetupForm();
-  if (page === 'compare') renderCompare();
+  if (page === 'stats') renderStats();
+  if (page === 'ai') renderAiPage();
 }
 
 function saveSetup() {
@@ -1322,7 +1651,175 @@ function saveSetup() {
 let carProfiles = JSON.parse(localStorage.getItem('pitlog_profiles') || '[]');
 let editingProfileId = null;
 
-// ── Accent Color ──────────────────────────────────────────
+// ── AI Debrief ────────────────────────────────────────────
+function saveApiKey(val) {
+  localStorage.setItem('pitlog_apikey', val.trim());
+}
+
+async function testApiKey() {
+  const apiKey = localStorage.getItem('pitlog_apikey') || '';
+  if (!apiKey) { showToast('ENTER AN API KEY FIRST'); return; }
+
+  const statusEl = document.getElementById('api-test-status');
+  statusEl.textContent = 'TESTING...';
+  statusEl.style.color = 'var(--muted)';
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: 'Say OK.' }] }]
+      })
+    });
+
+    if (response.ok) {
+      statusEl.textContent = '✓ CONNECTED';
+      statusEl.style.color = '#00cc66';
+    } else {
+      statusEl.textContent = '✕ INVALID KEY';
+      statusEl.style.color = '#ff4d4d';
+    }
+  } catch (err) {
+    statusEl.textContent = '✕ ERROR';
+    statusEl.style.color = '#ff4d4d';
+  }
+
+  setTimeout(() => { statusEl.textContent = ''; }, 4000);
+}
+
+function loadApiKeyForm() {
+  const key = localStorage.getItem('pitlog_apikey') || '';
+  const el = document.getElementById('s-api-key');
+  if (el) el.value = key;
+}
+
+function closeDebrief() {
+  document.getElementById('debrief-overlay').classList.remove('active');
+}
+
+async function runDebrief() {
+  const apiKey = localStorage.getItem('pitlog_apikey') || '';
+  if (!apiKey) {
+    alert('Please enter your Gemini API key in the Setup page first.');
+    return;
+  }
+
+  const s = sessions.find(x => x.id == currentModalId);
+  if (!s) return;
+
+  // Show debrief modal
+  document.getElementById('debrief-overlay').classList.add('active');
+  document.getElementById('debrief-loading').style.display = 'flex';
+  document.getElementById('debrief-result').style.display = 'none';
+  document.getElementById('debrief-result').innerHTML = '';
+
+  // Build session summary for the prompt
+  const sessionInfo = `
+Track: ${s.track || '—'}
+Date: ${s.date || '—'}
+Best Lap: ${s.laptime || '—'}
+Car Profile: ${s.carProfile || '—'}
+Front Tire: ${s.tireFront || '—'}
+Rear Tire: ${s.tireRear || '—'}
+Tire Model: ${s.tireModel || '—'}
+Weather: ${s.weather || '—'}
+Air Temp: ${s.airTemp ? s.airTemp + '°C' : '—'}
+Track State: ${s.trackState || '—'}
+Front Compression: ${s.suspension?.frontComp || '—'} clicks
+Front Rebound: ${s.suspension?.frontReb || '—'} clicks
+Rear Compression: ${s.suspension?.rearComp || '—'} clicks
+Rear Rebound: ${s.suspension?.rearReb || '—'} clicks
+Handling — Entry: ${s.handling?.entry || '—'}
+Handling — Mid: ${s.handling?.mid || '—'}
+Handling — Exit: ${s.handling?.exit || '—'}
+Driver Notes: ${s.notes || '—'}
+Changes Noted: ${s.changes || '—'}
+  `.trim();
+
+  const prompt = `You are an expert motorsport engineer analyzing a race session debrief. Based on the session data below, provide a concise structured analysis.
+
+SESSION DATA:
+${sessionInfo}
+
+Respond in this exact JSON format (no markdown, no code blocks, just raw JSON):
+{
+  "summary": "2-3 sentence overall assessment of the session",
+  "handling_analysis": "1-2 sentences interpreting the entry/mid/exit handling data and what it means for setup",
+  "priority_changes": [
+    "Specific change 1 with exact click adjustment if possible",
+    "Specific change 2",
+    "Specific change 3"
+  ],
+  "positive": "What was working well this session",
+  "watch_next": "One key thing to monitor in the next session"
+}`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.4 }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || `API error ${response.status}`);
+    }
+
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch {
+      throw new Error('Could not parse AI response. Try again.');
+    }
+
+    const html = `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Overall Assessment</div>
+        <div class="debrief-text">${parsed.summary}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Handling Analysis</div>
+        <div class="debrief-text">${parsed.handling_analysis}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Priority Changes for Next Session</div>
+        ${parsed.priority_changes.map(c => `
+          <div class="debrief-item">
+            <span class="debrief-bullet">→</span>
+            <span>${c}</span>
+          </div>`).join('')}
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">What's Working</div>
+        <div class="debrief-text">${parsed.positive}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Watch Next Session</div>
+        <div class="debrief-text">${parsed.watch_next}</div>
+      </div>
+    `;
+
+    document.getElementById('debrief-loading').style.display = 'none';
+    document.getElementById('debrief-result').style.display = 'block';
+    document.getElementById('debrief-result').innerHTML = html;
+
+  } catch (err) {
+    document.getElementById('debrief-loading').style.display = 'none';
+    document.getElementById('debrief-result').style.display = 'block';
+    document.getElementById('debrief-result').innerHTML = `
+      <div class="debrief-error">
+        ⚠ ${err.message}<br><br>
+        Check your API key in Setup and try again.
+      </div>`;
+  }
+}
 function previewAccent(color) {
   document.documentElement.style.setProperty('--accent', color);
   document.getElementById('accent-color-picker').value = color;
@@ -1441,7 +1938,7 @@ function editProfile(id) {
   document.getElementById('p-note').value = p.note;
   document.getElementById('s-profile-form-title').textContent = 'EDIT PROFILE';
   document.getElementById('p-cancel-btn').style.display = 'block';
-  document.getElementById('s-profile-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => document.getElementById('s-profile-form').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 }
 
 function deleteProfile(id) {
@@ -1465,6 +1962,31 @@ function clearProfileForm() {
   document.getElementById('p-cancel-btn').style.display = 'none';
 }
 
+function toggleProfileCard(id) {
+  const card = document.getElementById(`pcard-${id}`);
+  if (!card) return;
+  const isExpanded = card.classList.contains('expanded');
+  // Collapse all others
+  document.querySelectorAll('.profile-card.expanded').forEach(c => c.classList.remove('expanded'));
+  if (!isExpanded) card.classList.add('expanded');
+}
+
+function deleteProfile(id) {
+  const btn = document.getElementById(`pdel-${id}`);
+  if (!btn) return;
+  if (btn.dataset.confirm !== 'yes') {
+    btn.textContent = 'TAP AGAIN TO DELETE';
+    btn.dataset.confirm = 'yes';
+    setTimeout(() => { if (btn) { btn.textContent = 'DELETE'; btn.dataset.confirm = ''; } }, 3000);
+    return;
+  }
+  carProfiles = carProfiles.filter(p => p.id !== id);
+  localStorage.setItem('pitlog_profiles', JSON.stringify(carProfiles));
+  if (editingProfileId === id) { clearProfileForm(); editingProfileId = null; }
+  renderProfileList();
+  populateCarProfileDropdown();
+}
+
 function renderProfileList() {
   const container = document.getElementById('s-profile-list');
   if (!container) return;
@@ -1472,15 +1994,29 @@ function renderProfileList() {
     container.innerHTML = '<div class="track-empty">No car profiles yet — create one below</div>';
     return;
   }
+  const dr = (label, val) => val ? `<div class="profile-detail-row"><span class="profile-dk">${label}</span><span class="profile-dv">${val}</span></div>` : '';
   container.innerHTML = carProfiles.map(p => `
-    <div class="profile-item">
-      <div class="profile-item-info">
-        <div class="profile-item-name">🚗 ${p.name}</div>
-        <div class="profile-item-sub">${[p.year, p.make, p.model].filter(Boolean).join(' ')}</div>
+    <div class="profile-card" id="pcard-${p.id}" onclick="toggleProfileCard(${p.id})">
+      <div class="profile-card-header">
+        <div>
+          <div class="profile-card-name">🚗 ${p.name}</div>
+          <div class="profile-card-sub">${[p.year, p.make, p.model].filter(Boolean).join(' ') || 'No details added'}</div>
+        </div>
+        <div class="profile-card-chevron">›</div>
       </div>
-      <div class="profile-item-actions">
-        <button class="profile-edit-btn" onclick="editProfile(${p.id})">Edit</button>
-        <button class="track-del" onclick="deleteProfile(${p.id})">✕</button>
+      <div class="profile-card-details">
+        ${dr('Make', p.make)}
+        ${dr('Model', p.model)}
+        ${dr('Year', p.year)}
+        ${dr('Coilover', p.coilover)}
+        ${dr('Spring Rate Front', p.springF)}
+        ${dr('Spring Rate Rear', p.springR)}
+        ${dr('Weight', p.weight ? p.weight + ' lbs' : '')}
+        ${p.note ? `<div class="profile-note-text">${p.note}</div>` : ''}
+        <div class="profile-card-actions" onclick="event.stopPropagation()">
+          <button class="profile-edit-btn" onclick="editProfile(${p.id})">✏ EDIT</button>
+          <button class="profile-del-btn" id="pdel-${p.id}" onclick="deleteProfile(${p.id})">DELETE</button>
+        </div>
       </div>
     </div>
   `).join('');
@@ -1625,6 +2161,7 @@ function loadSetupForm() {
   loadClickSettingsForm();
   const saved = localStorage.getItem('pitlog_accent');
   if (saved) { document.getElementById('accent-color-picker').value = saved; previewAccent(saved); }
+  loadApiKeyForm();
 }
 
 function addTrack() {
@@ -1732,6 +2269,7 @@ function saveSession() {
 
   sessions.unshift(session);
   localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  haptic('success');
   showToast('SESSION SAVED ✓');
   resetForm();
 }
@@ -1907,12 +2445,14 @@ let compareSortDir = -1; // -1 = desc, 1 = asc
 
 function renderCompare() {
   if (sessions.length === 0) {
-    document.getElementById('compare-filters').style.display = 'none';
-    document.getElementById('compare-wrap') && (document.querySelector('.compare-wrap').style.display = 'none');
-    document.getElementById('compare-empty').style.display = 'block';
+    const filters = document.getElementById('compare-filters');
+    const wrap = document.querySelector('#stats-compare .compare-wrap');
+    if (filters) filters.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:0.85rem;text-align:center;">No sessions logged yet</div>';
+    if (wrap) wrap.style.display = 'none';
     return;
   }
-  document.getElementById('compare-empty').style.display = 'none';
+  const wrap = document.querySelector('#stats-compare .compare-wrap');
+  if (wrap) wrap.style.display = '';
   renderCompareFilters();
   renderCompareTable();
 }
@@ -1921,8 +2461,9 @@ const FILTER_KEYS = ['track', 'carProfile', 'tireFront', 'tireRear', 'tireModel'
 
 function renderCompareFilters() {
   const container = document.getElementById('compare-filters');
+  if (!container) return;
   container.innerHTML = COLS.filter(col => FILTER_KEYS.includes(col.key)).map(col => {
-    const vals = [...new Set(sessions.map(col.get).filter(Boolean))].sort();
+    const vals = [...new Set(sessions.map((s, i) => col.get(s, i, sessions)).filter(Boolean))].sort();
     const options = vals.map(v => `<option value="${v}"${compareFilters[col.key]===v?' selected':''}>${v}</option>`).join('');
     return `<div class="filter-group">
       <label>${col.label}</label>
@@ -2052,9 +2593,507 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Close modal when tapping backdrop
+// ── Haptic Feedback ──────────────────────────────────────
+function haptic(style = 'light') {
+  if (navigator.vibrate) {
+    const patterns = { light: [10], medium: [20], success: [10, 50, 10] };
+    navigator.vibrate(patterns[style] || [10]);
+  }
+}
+
+// ── Tab switching ─────────────────────────────────────────
+function switchStatsTab(tab, btn) {
+  document.querySelectorAll('#page-stats .stats-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('stats-' + tab).classList.add('active');
+  if (tab === 'chart') renderChart();
+  if (tab === 'compare') renderCompare();
+  if (tab === 'delta') populateDeltaSelects();
+  if (tab === 'bests') renderBests();
+}
+
+function switchAiTab(tab, btn) {
+  document.querySelectorAll('#page-ai .stats-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ai-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ai-' + tab).classList.add('active');
+}
+
+// ── Stats Page ────────────────────────────────────────────
+function renderStats() {
+  renderBests();
+  populateChartTrackSelect();
+  populateBvlTrackSelect();
+  populateDeltaSelects();
+}
+
+// Personal Bests per track
+function renderBests() {
+  const container = document.getElementById('bests-content');
+  if (!container) return;
+  if (sessions.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">No sessions logged yet</div>';
+    return;
+  }
+  const byTrack = {};
+  sessions.forEach((s, i) => {
+    if (!s.track) return;
+    if (!byTrack[s.track]) byTrack[s.track] = [];
+    byTrack[s.track].push({ ...s, _num: sessions.length - i });
+  });
+
+  container.innerHTML = Object.entries(byTrack).map(([track, ss]) => {
+    const withLap = ss.filter(s => s.laptime).sort((a, b) => a.laptime.localeCompare(b.laptime));
+    const best = withLap[0];
+    const totalSessions = ss.length;
+    const lastDate = ss[0].date;
+    return `
+      <div class="bests-track-section">
+        <div class="bests-track-name">🏁 ${track}</div>
+        ${best ? `
+          <div class="bests-row" onclick="openModal(${best.id})" style="cursor:pointer;">
+            <span class="bests-label">Best Lap 🔍</span>
+            <div style="text-align:right;">
+              <div class="bests-val gold">${best.laptime}</div>
+              <div class="bests-sub">Session #${best._num} · ${best.date} — tap to view</div>
+            </div>
+          </div>` : ''}
+        <div class="bests-row">
+          <span class="bests-label">Sessions at this track</span>
+          <span class="bests-val">${totalSessions}</span>
+        </div>
+        <div class="bests-row">
+          <span class="bests-label">Last visited</span>
+          <span class="bests-val">${lastDate}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// Lap Time Chart
+function populateChartTrackSelect() {
+  const sel = document.getElementById('chart-track-sel');
+  if (!sel) return;
+  const tracks = [...new Set(sessions.map(s => s.track).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">— Select Track —</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderChart() {
+  const track = document.getElementById('chart-track-sel')?.value;
+  const canvas = document.getElementById('lap-chart');
+  const empty = document.getElementById('chart-empty');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const filtered = sessions.filter(s => s.track === track && s.laptime).reverse();
+
+  if (!track || filtered.length === 0) {
+    canvas.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  if (empty) empty.style.display = 'none';
+
+  // Convert lap times (m:ss.ms or ss.ms) to seconds for comparison
+  const toSec = t => {
+    if (!t) return null;
+    const parts = t.split(':');
+    if (parts.length === 2) return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
+    return parseFloat(t);
+  };
+
+  const data = filtered.map(s => toSec(s.laptime));
+  const labels = filtered.map((s, i) => `#${sessions.length - sessions.indexOf(s)}`);
+  const minVal = Math.min(...data.filter(Boolean));
+  const maxVal = Math.max(...data.filter(Boolean));
+  const pad = (maxVal - minVal) * 0.15 || 1;
+
+  const W = canvas.offsetWidth || 320;
+  const H = 220;
+  canvas.width = W;
+  canvas.height = H;
+
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e8ff00';
+  const muted = '#444';
+  const text = '#f0f0f0';
+
+  ctx.clearRect(0, 0, W, H);
+
+  const left = 44, right = 16, top = 16, bottom = 36;
+  const chartW = W - left - right;
+  const chartH = H - top - bottom;
+  const n = data.length;
+
+  // Grid lines
+  const steps = 4;
+  for (let i = 0; i <= steps; i++) {
+    const y = top + (chartH / steps) * i;
+    const val = maxVal + pad - ((maxVal - minVal + 2 * pad) / steps) * i;
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(left + chartW, y);
+    ctx.stroke();
+    ctx.fillStyle = muted;
+    ctx.font = '10px Barlow';
+    ctx.textAlign = 'right';
+    const mm = Math.floor(val / 60);
+    const ss = (val % 60).toFixed(2).padStart(5, '0');
+    ctx.fillText(mm > 0 ? `${mm}:${ss}` : `${ss}s`, left - 4, y + 4);
+  }
+
+  // Line
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = left + (n === 1 ? chartW / 2 : (chartW / (n - 1)) * i);
+    const y = top + chartH - ((v - (minVal - pad)) / (maxVal - minVal + 2 * pad)) * chartH;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots + labels
+  data.forEach((v, i) => {
+    const x = left + (n === 1 ? chartW / 2 : (chartW / (n - 1)) * i);
+    const y = top + chartH - ((v - (minVal - pad)) / (maxVal - minVal + 2 * pad)) * chartH;
+    ctx.fillStyle = v === minVal ? accent : '#333';
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = muted;
+    ctx.font = '9px Barlow';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[i], x, H - 8);
+  });
+}
+
+// Best vs Latest
+function populateBvlTrackSelect() {
+  const sel = document.getElementById('bvl-track-sel');
+  if (!sel) return;
+  const tracks = [...new Set(sessions.map(s => s.track).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">— Select Track —</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderBestVsLatest() {
+  const track = document.getElementById('bvl-track-sel')?.value;
+  const container = document.getElementById('bvl-content');
+  if (!container) return;
+  const ss = sessions.filter(s => s.track === track && s.laptime);
+  if (!track || ss.length < 2) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Need at least 2 sessions with lap times at this track</div>';
+    return;
+  }
+  const latest = ss[0];
+  const best = [...ss].sort((a, b) => a.laptime.localeCompare(b.laptime))[0];
+  const latestNum = sessions.length - sessions.indexOf(latest);
+  const bestNum = sessions.length - sessions.indexOf(best);
+
+  const row = (label, bVal, lVal) => `
+    <div class="bvl-cell key">${label}</div>
+    <div class="bvl-cell val ${bVal === lVal ? '' : 'accent'}">${bVal || '—'}</div>
+    <div class="bvl-cell val">${lVal || '—'}</div>`;
+
+  container.innerHTML = `
+    <div class="bvl-grid">
+      <div class="bvl-hdr"></div>
+      <div class="bvl-hdr">Best (#${bestNum})</div>
+      <div class="bvl-hdr">Latest (#${latestNum})</div>
+      ${row('Lap Time', best.laptime, latest.laptime)}
+      ${row('Date', best.date, latest.date)}
+      ${row('F. Comp', best.suspension?.frontComp, latest.suspension?.frontComp)}
+      ${row('F. Reb', best.suspension?.frontReb, latest.suspension?.frontReb)}
+      ${row('R. Comp', best.suspension?.rearComp, latest.suspension?.rearComp)}
+      ${row('R. Reb', best.suspension?.rearReb, latest.suspension?.rearReb)}
+      ${row('Tire Model', best.tireModel, latest.tireModel)}
+      ${row('Weather', best.weather, latest.weather)}
+      ${row('Air Temp', best.airTemp ? best.airTemp + '°C' : '', latest.airTemp ? latest.airTemp + '°C' : '')}
+    </div>`;
+}
+
+// Setup Delta
+function populateDeltaSelects() {
+  const makeOpts = () => sessions.map((s, i) => {
+    const num = sessions.length - i;
+    return `<option value="${s.id}">#${num} — ${s.track} (${s.date})</option>`;
+  }).join('');
+  const a = document.getElementById('delta-a');
+  const b = document.getElementById('delta-b');
+  if (!a || !b) return;
+  const opts = '<option value="">— Select —</option>' + makeOpts();
+  a.innerHTML = opts;
+  b.innerHTML = opts;
+}
+
+function renderDelta() {
+  const idA = document.getElementById('delta-a')?.value;
+  const idB = document.getElementById('delta-b')?.value;
+  const container = document.getElementById('delta-content');
+  if (!container) return;
+  if (!idA || !idB || idA === idB) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Select two different sessions to compare</div>';
+    return;
+  }
+  const sA = sessions.find(s => s.id == idA);
+  const sB = sessions.find(s => s.id == idB);
+  if (!sA || !sB) return;
+
+  const numA = sessions.length - sessions.indexOf(sA);
+  const numB = sessions.length - sessions.indexOf(sB);
+
+  const diffNum = (a, b) => {
+    const na = parseFloat(a), nb = parseFloat(b);
+    if (isNaN(na) || isNaN(nb) || na === nb) return '<span class="delta-diff same">—</span>';
+    const d = nb - na;
+    const cls = d > 0 ? 'worse' : 'better';
+    return `<span class="delta-diff ${cls}">${d > 0 ? '+' : ''}${d}</span>`;
+  };
+
+  const row = (label, aVal, bVal, numericDiff = false) => `
+    <div class="delta-row">
+      <span class="delta-label">${label}</span>
+      <span class="delta-a-val">${aVal || '—'}</span>
+      <span class="delta-b-val">${bVal || '—'}</span>
+      ${numericDiff ? diffNum(aVal, bVal) : `<span class="delta-diff same">${aVal === bVal ? '=' : '≠'}</span>`}
+    </div>`;
+
+  container.innerHTML = `
+    <div class="delta-col-hdr">
+      <span>Field</span>
+      <span>#${numA}</span>
+      <span>#${numB}</span>
+      <span>Δ</span>
+    </div>
+    <div class="delta-section-hdr">Session</div>
+    ${row('Track', sA.track, sB.track)}
+    ${row('Date', sA.date, sB.date)}
+    ${row('Lap Time', sA.laptime, sB.laptime)}
+    ${row('Weather', sA.weather, sB.weather)}
+    ${row('Air Temp', sA.airTemp ? sA.airTemp + '°C' : '', sB.airTemp ? sB.airTemp + '°C' : '', true)}
+    <div class="delta-section-hdr">Suspension</div>
+    ${row('F. Comp', sA.suspension?.frontComp, sB.suspension?.frontComp, true)}
+    ${row('F. Reb', sA.suspension?.frontReb, sB.suspension?.frontReb, true)}
+    ${row('R. Comp', sA.suspension?.rearComp, sB.suspension?.rearComp, true)}
+    ${row('R. Reb', sA.suspension?.rearReb, sB.suspension?.rearReb, true)}
+    <div class="delta-section-hdr">Tires</div>
+    ${row('Front Tire', sA.tireFront, sB.tireFront)}
+    ${row('Rear Tire', sA.tireRear, sB.tireRear)}
+    ${row('Tire Model', sA.tireModel, sB.tireModel)}
+    <div class="delta-section-hdr">Handling</div>
+    ${row('Entry', sA.handling?.entry, sB.handling?.entry)}
+    ${row('Mid', sA.handling?.mid, sB.handling?.mid)}
+    ${row('Exit', sA.handling?.exit, sB.handling?.exit)}`;
+}
+
+// ── AI Page ───────────────────────────────────────────────
+function renderAiPage() {
+  // Populate track selects for trends
+  const trackSel = document.getElementById('trends-track-sel');
+  if (trackSel) {
+    const tracks = [...new Set(sessions.map(s => s.track).filter(Boolean))].sort();
+    trackSel.innerHTML = '<option value="">— Select Track —</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join('');
+  }
+  // Populate session select for autofill
+  const seSel = document.getElementById('autofill-session-sel');
+  if (seSel) {
+    seSel.innerHTML = '<option value="">— Select Session —</option>' + sessions.map((s, i) => {
+      const num = sessions.length - i;
+      return `<option value="${s.id}">#${num} — ${s.track} (${s.date})</option>`;
+    }).join('');
+  }
+}
+
+function aiLoading(containerId) {
+  document.getElementById(containerId).innerHTML = `
+    <div class="debrief-loading">
+      <div class="debrief-spinner"></div>
+      <div style="color:var(--muted);font-size:0.85rem;margin-top:12px;">Analysing...</div>
+    </div>`;
+}
+
+async function callGemini(prompt) {
+  const apiKey = localStorage.getItem('pitlog_apikey') || '';
+  if (!apiKey) throw new Error('No API key — add your Gemini key in Setup first.');
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 1000, temperature: 0.4 }
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error?.message || `API error ${response.status}`);
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+function renderAiResult(containerId, html) {
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function renderAiError(containerId, msg) {
+  document.getElementById(containerId).innerHTML = `<div class="debrief-error">⚠ ${msg}</div>`;
+}
+
+// AI Setup Advisor
+async function runAdvisor() {
+  const problem = document.getElementById('advisor-problem')?.value.trim();
+  if (!problem) { showToast('DESCRIBE THE PROBLEM FIRST'); return; }
+  aiLoading('advisor-result');
+
+  const fComp = document.getElementById('adv-fcomp')?.value;
+  const fReb  = document.getElementById('adv-freb')?.value;
+  const rComp = document.getElementById('adv-rcomp')?.value;
+  const rReb  = document.getElementById('adv-rreb')?.value;
+  const current = (fComp || fReb || rComp || rReb) ? `Current clicks — F.Comp: ${fComp||'?'}, F.Reb: ${fReb||'?'}, R.Comp: ${rComp||'?'}, R.Reb: ${rReb||'?'}` : '';
+
+  const prompt = `You are an expert motorsport suspension engineer. A driver describes this handling problem: "${problem}". ${current}
+
+Respond in raw JSON only (no markdown):
+{
+  "diagnosis": "1-2 sentence diagnosis of the root cause",
+  "changes": [
+    {"what": "Front Compression", "adjustment": "+2 clicks (stiffer)", "reason": "why"},
+    {"what": "Rear Rebound", "adjustment": "-1 click (softer)", "reason": "why"}
+  ],
+  "caution": "One thing to watch out for with these changes"
+}`;
+
+  try {
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    renderAiResult('advisor-result', `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Diagnosis</div>
+        <div class="debrief-text">${parsed.diagnosis}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Recommended Changes</div>
+        ${parsed.changes.map(c => `
+          <div class="debrief-item">
+            <span class="debrief-bullet">→</span>
+            <span><strong>${c.what}:</strong> ${c.adjustment} — ${c.reason}</span>
+          </div>`).join('')}
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">⚠ Caution</div>
+        <div class="debrief-text">${parsed.caution}</div>
+      </div>`);
+  } catch(e) { renderAiError('advisor-result', e.message); }
+}
+
+// AI Trend Analysis
+async function runTrends() {
+  const track = document.getElementById('trends-track-sel')?.value;
+  if (!track) { showToast('SELECT A TRACK FIRST'); return; }
+  const ss = sessions.filter(s => s.track === track).slice(0, 3);
+  if (ss.length < 2) { showToast('NEED AT LEAST 2 SESSIONS AT THIS TRACK'); return; }
+  aiLoading('trends-result');
+
+  const sessionSummaries = ss.map((s, i) => {
+    const num = sessions.length - sessions.indexOf(s);
+    return `Session #${num} (${s.date}): Lap=${s.laptime||'—'}, F.Comp=${s.suspension?.frontComp||'—'}, F.Reb=${s.suspension?.frontReb||'—'}, R.Comp=${s.suspension?.rearComp||'—'}, R.Reb=${s.suspension?.rearReb||'—'}, Entry=${s.handling?.entry||'—'}, Mid=${s.handling?.mid||'—'}, Exit=${s.handling?.exit||'—'}, Notes="${s.notes||''}"`;
+  }).join('\n');
+
+  const prompt = `You are an expert motorsport engineer. Analyse these ${ss.length} sessions at ${track} and identify trends:
+
+${sessionSummaries}
+
+Respond in raw JSON only (no markdown):
+{
+  "trend_summary": "2-3 sentence overview of how the car has evolved",
+  "whats_improving": "What aspect is getting better across sessions",
+  "persistent_issue": "Any problem that keeps appearing",
+  "next_direction": "Recommended direction for the next session at this track"
+}`;
+
+  try {
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    renderAiResult('trends-result', `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Trend Overview</div>
+        <div class="debrief-text">${parsed.trend_summary}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">What's Improving</div>
+        <div class="debrief-text">${parsed.whats_improving}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Persistent Issue</div>
+        <div class="debrief-text">${parsed.persistent_issue}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Next Session Direction</div>
+        <div class="debrief-text">${parsed.next_direction}</div>
+      </div>`);
+  } catch(e) { renderAiError('trends-result', e.message); }
+}
+
+// AI Auto-fill Changes
+async function runAutofill() {
+  const id = document.getElementById('autofill-session-sel')?.value;
+  if (!id) { showToast('SELECT A SESSION FIRST'); return; }
+  const s = sessions.find(x => x.id == id);
+  if (!s) return;
+  aiLoading('autofill-result');
+
+  const prompt = `Based on this race session data, write a concise "Changes for Next Session" note (2-4 bullet points, practical and specific):
+
+Track: ${s.track}, Lap: ${s.laptime||'—'}
+Handling: Entry=${s.handling?.entry||'—'}, Mid=${s.handling?.mid||'—'}, Exit=${s.handling?.exit||'—'}
+Coilovers: F.Comp=${s.suspension?.frontComp||'—'}, F.Reb=${s.suspension?.frontReb||'—'}, R.Comp=${s.suspension?.rearComp||'—'}, R.Reb=${s.suspension?.rearReb||'—'}
+Notes: ${s.notes||'none'}
+
+Respond in raw JSON only (no markdown):
+{"changes": ["change 1", "change 2", "change 3"]}`;
+
+  try {
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    const text = parsed.changes.map(c => `• ${c}`).join('\n');
+    _pendingAutofillId = s.id;
+    _pendingAutofillText = text;
+    renderAiResult('autofill-result', `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Suggested Changes for Next Session</div>
+        ${parsed.changes.map(c => `<div class="debrief-item"><span class="debrief-bullet">→</span><span>${c}</span></div>`).join('')}
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="applyPendingAutofill()">APPLY TO SESSION</button>`);
+  } catch(e) { renderAiError('autofill-result', e.message); }
+}
+
+let _pendingAutofillId = null;
+let _pendingAutofillText = null;
+
+function applyAutofill(id, text) {
+  const s = sessions.find(x => x.id == id);
+  if (!s) { showToast('SESSION NOT FOUND'); return; }
+  s.changes = text;
+  localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  showToast('CHANGES APPLIED ✓');
+  haptic('success');
+}
+
+function applyPendingAutofill() {
+  if (!_pendingAutofillId || !_pendingAutofillText) return;
+  applyAutofill(_pendingAutofillId, _pendingAutofillText);
+}
+
+// ── Close modal when tapping backdrop
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeModalDirect();
+});
+document.getElementById('debrief-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDebrief();
 });
 
 loadAccentColor();
