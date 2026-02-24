@@ -1,0 +1,4595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TrackLogger — Race Setup</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Theme & Status Bar -->
+<meta name="theme-color" content="#0d0d0d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TrackLogger">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #e8ff00;
+    --accent2: #ff4d00;
+    --text: #f0f0f0;
+    --muted: #666;
+    --input-bg: #111;
+  }
+
+  :root.light {
+    --bg: #f2f1ed;
+    --surface: #ffffff;
+    --surface2: #eae9e4;
+    --border: #dddcD6;
+    --text: #18180f;
+    --muted: #9a9890;
+    --input-bg: #f8f7f3;
+  }
+
+  body, .bottom-nav, .card, header, .modal, .modal-overlay .modal,
+  input, select, textarea, .session-card, .profile-card,
+  .compare-table thead th, .cheat-table thead th {
+    transition: background-color 0.25s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 96px;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+  .logo span { color: var(--text); }
+
+  /* Bottom nav bar */
+  .bottom-nav {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 58px;
+    width: calc(100% - 32px);
+    max-width: 480px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    display: flex;
+    align-items: stretch;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
+    overflow: hidden;
+    padding: 6px;
+    gap: 2px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    transition: color 0.2s;
+    border-radius: 100px;
+    position: relative;
+    padding: 0;
+  }
+  .nav-btn.active {
+    color: #000;
+    background: var(--accent);
+  }
+  .nav-btn.active::before { display: none; }
+
+  .nav-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s, transform 0.15s;
+  }
+  .nav-btn.active svg { stroke-width: 2.2; }
+  .nav-btn .nav-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.52rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: opacity 0.15s;
+  }
+  .nav-btn:not(.active) .nav-label { display: none; }
+
+  @keyframes nav-pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    70%  { transform: scale(0.94); }
+    100% { transform: scale(1); }
+  }
+  .nav-btn.popping svg {
+    animation: nav-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ── Home Page ─────────────────────────────────────────── */
+  .home-hero {
+    margin: 16px 16px 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::after {
+    content: 'TL';
+    position: absolute;
+    right: -8px;
+    bottom: -18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 7rem;
+    color: var(--accent);
+    opacity: 0.06;
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -4px;
+  }
+  .home-greeting {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    color: var(--text);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .home-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 4px;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+  .home-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    padding: 12px 22px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .home-new-btn:active { opacity: 0.85; transform: scale(0.97); }
+
+  /* Stats row */
+  .home-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin: 10px 16px 0;
+  }
+  .home-stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .home-stat-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .home-stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Last session card */
+  .home-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 18px 16px 8px;
+  }
+  .home-last-card {
+    margin: 0 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .home-last-card:hover { border-color: var(--accent); }
+  .home-last-top {
+    background: var(--surface2);
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .home-last-track {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    color: var(--text);
+  }
+  .home-last-date { font-size: 0.72rem; color: var(--muted); }
+  .home-last-lap {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .home-last-body { padding: 12px 16px; }
+  .home-last-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .home-last-row:last-child { border-bottom: none; }
+  .home-last-key {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Bests list */
+  .home-bests-card {
+    margin: 0 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .home-best-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .home-best-row:last-child { border-bottom: none; }
+  .home-best-row:hover { background: var(--surface2); }
+  .home-best-track {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+  .home-best-sub { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+  .home-best-lap {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .home-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+  .home-empty .big { font-size: 2.5rem; margin-bottom: 12px; }
+
+  /* ── Page base ─────────────────────────────────────────── */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+  #page-home { padding: 0 0 16px; }
+
+  /* Section headers */
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 6px 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  /* Form elements */
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 1rem;
+    padding: 10px 12px;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
+
+  /* Grid for paired inputs */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Corner setup */
+  .corner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .corner-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+  }
+  .corner-box .corner-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 8px;
+  }
+  .corner-box .field { margin-bottom: 8px; }
+  .corner-box .field label { font-size: 0.65rem; }
+  .corner-box .field input { padding: 8px 10px; font-size: 0.95rem; }
+
+  /* Range slider */
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .slider-row input[type=range] {
+    flex: 1;
+    height: 4px;
+    border: none;
+    accent-color: var(--accent);
+    padding: 0;
+    cursor: pointer;
+  }
+  .slider-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* Weather icons */
+  .weather-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .weather-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    padding: 10px 6px;
+    text-align: center;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .weather-btn.selected {
+    border-color: var(--accent);
+    background: rgba(232,255,0,0.08);
+    color: var(--accent);
+  }
+  .weather-btn .wlabel {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 3px;
+    color: inherit;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    margin-top: 8px;
+  }
+  .btn-primary:active { opacity: 0.8; }
+
+  .btn-danger {
+    background: none;
+    border: 1px solid #ff4d4d44;
+    color: #ff4d4d;
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  /* Session cards in history */
+  .session-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .session-card:active { border-color: var(--accent); }
+  .session-card .s-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .session-card .s-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+  .session-card .s-track {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+  }
+  .session-card .s-date {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .session-card .s-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .s-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .s-tag span { color: var(--text); }
+
+  /* Detail modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .modal-overlay.active { display: block; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .detail-row .dk { color: var(--muted); font-size: 0.78rem; letter-spacing: 0.5px; }
+  .detail-row .dv { font-weight: 600; }
+
+  .detail-section {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 14px 0 6px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--muted);
+  }
+  .empty-state .big { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.9rem; line-height: 1.5; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: #000;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 3px;
+    transition: transform 0.3s ease;
+    z-index: 300;
+    white-space: nowrap;
+  }
+  /* Car profile cards */
+  .profile-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+  .profile-card:last-child { margin-bottom: 0; }
+  .profile-card:hover { border-color: var(--accent); background: #1a1a1a; }
+  .profile-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .profile-card-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .profile-card-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .profile-card-chevron {
+    color: var(--muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: transform 0.2s;
+  }
+  .profile-card.expanded .profile-card-chevron { transform: rotate(90deg); }
+
+  .profile-card-details {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .profile-card.expanded .profile-card-details { display: block; }
+
+  .profile-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.82rem;
+  }
+  .profile-detail-row:last-child { border-bottom: none; }
+  .profile-dk { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.5px; }
+  .profile-dv { color: var(--text); font-weight: 500; text-align: right; }
+
+  .profile-note-text {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: 3px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    border-left: 2px solid var(--accent);
+  }
+
+  .profile-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .profile-edit-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .profile-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .profile-del-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .profile-del-btn:hover { border-color: #ff4d4d; color: #ff4d4d; }
+
+  /* Color picker */
+  .color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #accent-color-picker {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  #accent-color-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 4px; }
+  #accent-color-picker::-webkit-color-swatch { border: none; border-radius: 4px; }
+
+  .color-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+  }
+  .color-preset {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+  .color-preset:hover { transform: scale(1.2); }
+  .color-preset.active { border-color: var(--text); transform: scale(1.15); }
+
+  /* Track list items */
+  .track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+  .track-item:last-child { border-bottom: none; }
+  .track-item .t-name { color: var(--text); }
+  .track-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: color 0.15s;
+    line-height: 1;
+  }
+  .track-del:hover { color: #ff4d4d; }
+
+  .track-empty {
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  /* Stats & AI tabs */
+  .stats-tabs {
+    display: flex;
+    padding: 10px 12px 0;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+  }
+  .stats-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .stats-panel { display: none; }
+  .stats-panel.active { display: block; }
+  .ai-panel { display: none; }
+  .ai-panel.active { display: block; }
+
+  /* Personal Bests */
+  .bests-track-section { margin: 12px; margin-bottom: 16px; background: var(--surface); border-radius: 6px; padding: 12px; }
+  .bests-track-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bests-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 0.82rem;
+  }
+  .bests-label { color: var(--muted); font-size: 0.72rem; }
+  .bests-val { color: var(--text); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .bests-val.gold { color: var(--accent); }
+
+  /* Delta view */
+  .delta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    gap: 8px;
+  }
+  .delta-row:last-child { border-bottom: none; }
+  .delta-label { color: var(--muted); font-size: 0.72rem; flex: 1.2; }
+  .delta-a-val, .delta-b-val { flex: 1; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .delta-diff { flex: 0 0 52px; text-align: right; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 0.82rem; }
+  .delta-diff.better { color: #00cc66; }
+  .delta-diff.worse  { color: #ff4d4d; }
+  .delta-diff.same   { color: var(--muted); }
+  .delta-section-hdr {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    padding: 12px 0 4px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+  .delta-col-hdr {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0 2px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 2px;
+  }
+  .delta-col-hdr span { flex: 1; text-align: center; }
+  .delta-col-hdr span:first-child { flex: 1.2; text-align: left; }
+  .delta-col-hdr span:last-child { flex: 0 0 52px; text-align: right; }
+
+  /* Best vs Latest */
+  .bvl-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 4px;
+  }
+  .bvl-hdr {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 6px 0;
+    border-bottom: 2px solid var(--accent);
+  }
+  .bvl-hdr:nth-child(2), .bvl-hdr:nth-child(3) { text-align: center; }
+  .bvl-row { display: contents; }
+  .bvl-cell {
+    padding: 7px 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bvl-cell.key { color: var(--muted); font-size: 0.72rem; }
+  .bvl-cell.val { text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; }
+  .bvl-cell.accent { color: var(--accent); }
+
+  /* Cheat Sheet page */
+  #page-cheat { padding: 12px 0; }
+
+  .cheat-intro {
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding: 0 12px 10px;
+    letter-spacing: 0.3px;
+    line-height: 1.5;
+  }
+
+  .cheat-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px 20px;
+  }
+
+  .cheat-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+    font-size: 0.78rem;
+  }
+
+  .cheat-table thead th {
+    background: var(--surface);
+    color: var(--accent);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 2px solid var(--accent);
+    white-space: nowrap;
+  }
+  .cheat-table thead th:first-child { text-align: left; }
+  .cheat-table thead th:last-child  { text-align: left; }
+
+  .cheat-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .cheat-table tbody tr:hover { background: var(--surface); }
+
+  .cheat-group-us { border-left: 2px solid #ffaa00; }
+  .cheat-group-os { border-left: 2px solid #ff4d4d; }
+
+  .cheat-situation {
+    padding: 10px 8px;
+    color: var(--text);
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .cheat-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    padding: 2px 5px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .cheat-badge.us   { background: #ffaa0022; color: #ffaa00; border: 1px solid #ffaa0055; }
+  .cheat-badge.os   { background: #ff4d4d22; color: #ff4d4d; border: 1px solid #ff4d4d55; }
+  .cheat-badge.other { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .cheat-table td {
+    padding: 10px 8px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .cheat-table td:first-child { text-align: left; padding: 6px 8px; }
+  .cheat-table td:last-child  { text-align: left; color: var(--muted); font-size: 0.72rem; white-space: normal; min-width: 140px; }
+
+  .cheat-up      { color: #ff4d4d; font-weight: 700; font-size: 0.95rem; }
+  .cheat-down    { color: #00ccff; font-weight: 700; font-size: 0.95rem; }
+  .cheat-neutral { color: var(--muted); font-size: 0.95rem; }
+
+  /* ── Coilover Visual ─────────────────────────────────── */
+  .coilover-visual {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 12px 12px;
+    margin-bottom: 18px;
+  }
+  .coil-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .coil-legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .coil-legend-txt { color: var(--muted); }
+
+  .coil-corners {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .coil-corner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .coil-corner-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .coil-bars {
+    display: flex;
+    gap: 5px;
+    align-items: flex-end;
+    height: 90px;
+  }
+  .coil-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .coil-bar-track {
+    width: 14px;
+    height: 72px;
+    background: #222;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+  .coil-bar-fill {
+    width: 100%;
+    height: 0%;
+    border-radius: 3px;
+    transition: height 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .coil-bar-fill.accent { background: var(--accent); }
+  .coil-bar-fill.dim    { background: #555; }
+  .coil-bar-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--text);
+    line-height: 1;
+  }
+  .coil-bar-sublabel {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .coil-section-divider {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  /* ── Theme Toggle ─────────────────────────────────────── */
+  .theme-toggle-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .theme-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+  }
+  .theme-btn.active {
+    border-color: var(--accent);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .theme-btn-icon { font-size: 1.2rem; }
+  .theme-btn-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Light theme overrides for elements that need explicit fixes */
+  :root.light .bottom-nav {
+    background: #1a1a1a;
+    border-color: rgba(255,255,255,0.08);
+  }
+  :root.light header {
+    background: var(--surface);
+    border-bottom-color: var(--border);
+  }
+  :root.light .coil-bar-track { background: #dddcd6; }
+  :root.light .coil-bar-fill.dim { background: #aaa; }
+  :root.light .coil-corner-label { color: var(--muted); }
+  :root.light .compare-table tbody tr:hover { background: var(--surface2); }
+  :root.light .cheat-table tbody tr:hover { background: var(--surface2); }
+  :root.light .session-card:hover { border-color: var(--muted); }
+  :root.light .stats-tab { color: var(--muted); }
+  :root.light .stats-tab.active { color: var(--text); }
+
+  /* ── Swipe to Delete ─────────────────────────────────── */
+  .swipe-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .swipe-delete-bg {
+    position: absolute;
+    inset: 0;
+    background: #c0392b;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 22px;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+  .swipe-delete-icon {
+    font-size: 1.3rem;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .swipe-wrap.revealing .swipe-delete-icon {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .swipe-delete-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    margin-right: 8px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .swipe-wrap.revealing .swipe-delete-label { opacity: 1; }
+
+  .swipe-card {
+    position: relative;
+    will-change: transform;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    border-radius: 4px;
+    background: var(--surface);
+    touch-action: pan-y;
+  }
+  .swipe-card.dragging { transition: none; }
+  .swipe-card.deleting {
+    transform: translateX(-110%) !important;
+    transition: transform 0.3s cubic-bezier(0.55, 0, 1, 0.45);
+    opacity: 0;
+  }
+  .swipe-wrap.collapsing {
+    max-height: 0 !important;
+    margin-bottom: 0 !important;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, margin-bottom 0.3s ease, opacity 0.2s ease;
+  }
+  .swipe-wrap { transition: max-height 0.3s ease, margin-bottom 0.3s ease, opacity 0.2s ease; }
+
+  .session-card { margin-bottom: 0; }
+
+  /* ── Event Groups ─────────────────────────────────────── */
+  .event-group { margin-bottom: 6px; }
+
+  .event-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: border-color 0.15s;
+    user-select: none;
+  }
+  .event-header:hover { border-color: var(--accent); }
+  .event-header.ungrouped { background: var(--surface2); }
+
+  .event-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .event-collapse-icon {
+    font-size: 0.6rem;
+    color: var(--muted);
+    width: 10px;
+    flex-shrink: 0;
+  }
+  .event-name-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+    color: var(--text);
+  }
+  .event-date-range {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 1px;
+    letter-spacing: 0.5px;
+  }
+  .event-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .event-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 7px;
+  }
+  .event-best {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+  .event-sessions {
+    padding-left: 10px;
+    border-left: 2px solid var(--accent);
+    margin-left: 6px;
+    overflow: hidden;
+    max-height: 9999px;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    opacity: 1;
+  }
+  .event-sessions.collapsed { max-height: 0; opacity: 0; }
+  .event-sessions .session-card { margin-bottom: 6px; }
+  .event-sessions .session-card:last-child { margin-bottom: 0; }
+
+  .event-mgr-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .event-mgr-row:last-child { border-bottom: none; }
+  .event-mgr-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    flex: 1;
+  }
+  .event-mgr-count { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+
+  /* Track GPS badge */
+  .track-gps-badge {
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .track-gps-badge.has-gps { color: var(--accent); }
+
+  /* Compare page */
+  #page-compare { padding: 12px 0 12px 0; }
+
+  .compare-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 12px 10px;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 90px;
+    flex: 1;
+  }
+  .filter-group label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .filter-group select, .filter-group input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.8rem;
+    padding: 6px 8px;
+    -webkit-appearance: none;
+    width: 100%;
+  }
+  .filter-group select:focus, .filter-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .compare-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    min-width: 700px;
+  }
+
+  .compare-table thead th {
+    background: var(--surface);
+    color: var(--accent);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 10px;
+    text-align: left;
+    border-bottom: 2px solid var(--accent);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .compare-table thead th:hover { color: var(--text); }
+  .compare-table thead th .sort-icon { margin-left: 4px; opacity: 0.4; font-size: 0.7rem; }
+  .compare-table thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+
+  .compare-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .compare-table tbody tr:hover { background: var(--surface); }
+
+  .compare-table tbody td {
+    padding: 9px 10px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .compare-table tbody td:first-child {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+  }
+  .compare-table tbody td.lap {
+    color: var(--accent);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .compare-table .no-data { color: var(--muted); font-style: italic; }
+
+  /* AI Debrief */
+  .btn-ai {
+    flex: 1;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 3px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .btn-ai:hover { background: rgba(232,255,0,0.1); }
+
+  .debrief-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 0;
+  }
+  .debrief-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .debrief-section {
+    margin-bottom: 16px;
+  }
+  .debrief-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .debrief-text {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .debrief-item {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .debrief-item:last-child { border-bottom: none; }
+  .debrief-bullet {
+    color: var(--accent);
+    font-weight: 900;
+    flex-shrink: 0;
+    font-size: 1rem;
+    margin-top: 1px;
+  }
+  .debrief-error {
+    color: #ff4d4d;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.6;
+  }
+
+  /* Calendar picker */
+  .cal-trigger {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 1rem;
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.15s;
+    user-select: none;
+  }
+  .cal-trigger:hover, .cal-trigger.open { border-color: var(--accent); }
+  .cal-trigger svg { color: var(--muted); flex-shrink: 0; }
+
+  .cal-dropdown {
+    display: none;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    margin-top: 6px;
+    padding: 12px;
+    position: relative;
+    z-index: 10;
+  }
+  .cal-dropdown.open { display: block; }
+
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .cal-month-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .cal-nav {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-size: 1.3rem;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, color 0.15s;
+    line-height: 1;
+  }
+  .cal-nav:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .cal-weekdays span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--muted);
+    padding: 4px 0;
+  }
+
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.1s;
+    color: var(--text);
+  }
+  .cal-day:hover { border-color: var(--accent); color: var(--accent); }
+  .cal-day.today { color: var(--accent2); font-weight: 700; }
+  .cal-day.selected { background: var(--accent); color: #000; font-weight: 700; }
+  .cal-day.empty { cursor: default; }
+  .cal-day.empty:hover { border-color: transparent; }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TRACK<span>LOGGER</span></div>
+  <div style="font-size:0.7rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;" id="header-title">New Session</div>
+</header>
+
+<!-- Bottom nav bar -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="showPage('history')">
+    <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+    <span class="nav-label">Sessions</span>
+  </button>
+  <button class="nav-btn" id="nav-stats" onclick="showPage('stats')">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="nav-label">Stats</span>
+  </button>
+  <button class="nav-btn" id="nav-ai" onclick="showPage('ai')">
+    <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    <span class="nav-label">AI</span>
+  </button>
+  <button class="nav-btn" id="nav-setup" onclick="showPage('setup')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="nav-label">Setup</span>
+  </button>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+
+  <!-- Greeting + Quick Start -->
+  <div class="home-hero">
+    <div class="home-greeting" id="home-greeting">Good morning</div>
+    <div class="home-sub">Ready to log a session?</div>
+    <button class="home-new-btn" onclick="showPage('log')">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      NEW SESSION
+    </button>
+  </div>
+
+  <!-- Quick Stats Row -->
+  <div class="home-stats-row" id="home-stats-row"></div>
+
+  <!-- Last Session -->
+  <div id="home-last-session"></div>
+
+  <!-- Personal Bests -->
+  <div id="home-bests"></div>
+
+</div>
+
+<!-- LOG PAGE -->
+<div class="page" id="page-log">
+
+  <!-- Session Info -->
+  <div class="card">
+    <div class="section-label">Session Info</div>
+    <div class="field">
+      <label>Event / Weekend</label>
+      <div style="display:flex;gap:8px;">
+        <select id="event" style="flex:1;">
+          <option value="">— Select or create event —</option>
+        </select>
+        <button onclick="quickCreateEvent()" title="Quick-create event from track + date" style="background:var(--accent);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.75rem;letter-spacing:1.5px;padding:0 12px;cursor:pointer;flex-shrink:0;white-space:nowrap;">+ CREATE</button>
+      </div>
+      <div id="event-create-status" style="display:none;font-size:0.7rem;color:var(--accent);margin-top:5px;"></div>
+    </div>
+    <div class="field">
+      <label>Track</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <select id="track" style="flex:1;">
+          <option value="">— Select a track —</option>
+        </select>
+        <button onclick="findNearestTrack()" id="gps-track-btn" title="Find nearest track" style="background:var(--surface2);border:1px solid var(--border);color:var(--accent);border-radius:3px;font-size:1rem;padding:0 12px;cursor:pointer;flex-shrink:0;transition:all 0.15s;">📍</button>
+      </div>
+      <div id="gps-track-status" style="font-size:0.7rem;color:var(--muted);margin-top:5px;display:none;"></div>
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <div class="cal-trigger" id="cal-trigger" onclick="toggleCal()">
+        <span id="cal-display">Select a date</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <input type="hidden" id="date">
+      <!-- Calendar dropdown -->
+      <div class="cal-dropdown" id="cal-dropdown">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calShift(-1)">&#8249;</button>
+          <span class="cal-month-label" id="cal-month-label"></span>
+          <button class="cal-nav" onclick="calShift(1)">&#8250;</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div class="cal-days" id="cal-days"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Best Lap Time</label>
+      <input type="text" id="laptime" placeholder="1:32.456">
+    </div>
+  </div>
+
+  <!-- Car Setup -->
+  <div class="card">
+    <div class="section-label">Car Setup</div>
+    <div class="field">
+      <label>Car Profile</label>
+      <select id="car-profile">
+        <option value="">— Select a car profile —</option>
+      </select>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Front Tire Size</label>
+        <select id="tire-front">
+          <option value="">— Select —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Rear Tire Size</label>
+        <select id="tire-rear">
+          <option value="">— Select —</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tire Model</label>
+      <select id="tire-model">
+        <option value="">— Select —</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Weather -->
+  <div class="card">
+    <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>Track &amp; Weather</span>
+      <button onclick="fetchWeather()" id="weather-fetch-btn" style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:all 0.15s;">
+        <span id="weather-fetch-icon">📍</span> Auto-fill
+      </button>
+    </div>
+    <div id="weather-status" style="display:none;font-size:0.72rem;color:var(--muted);margin-bottom:10px;padding:8px 10px;background:var(--surface2);border-radius:4px;border-left:2px solid var(--accent);line-height:1.5;"></div>
+    <div class="field">
+      <label>Conditions</label>
+      <div class="weather-grid">
+        <div class="weather-btn" onclick="selectWeather(this, 'Sunny')">☀️<span class="wlabel">Sunny</span></div>
+        <div class="weather-btn" onclick="selectWeather(this, 'Cloudy')">⛅<span class="wlabel">Cloudy</span></div>
+        <div class="weather-btn" onclick="selectWeather(this, 'Wet')">🌧️<span class="wlabel">Wet</span></div>
+        <div class="weather-btn" onclick="selectWeather(this, 'Mixed')">🌤️<span class="wlabel">Mixed</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Air Temp — <span id="air-temp-val">20</span>°C</label>
+      <div class="slider-row">
+        <input type="range" id="air-temp" min="-5" max="35" value="20" oninput="document.getElementById('air-temp-val').textContent=this.value">
+        <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted);width:100%;position:absolute;bottom:-16px;left:0;pointer-events:none;">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted);margin-top:4px;">
+        <span>-5°C</span><span>35°C</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Track State</label>
+      <select id="track-state">
+        <option>Green / Rubbered In</option>
+        <option>Green / Fresh</option>
+        <option>Damp</option>
+        <option>Wet</option>
+        <option>Drying</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Coilovers -->
+  <div class="card">
+    <div class="section-label">Coilovers</div>
+
+
+    <!-- Live bar visual -->
+    <div class="coilover-visual" id="coilover-visual">
+
+      <!-- Legend -->
+      <div class="coil-legend-row">
+        <span class="coil-legend-dot" style="background:var(--accent);"></span><span class="coil-legend-txt">Compression</span>
+        <span class="coil-legend-dot" style="background:#555;margin-left:12px;"></span><span class="coil-legend-txt">Rebound</span>
+      </div>
+
+      <!-- 4 corners -->
+      <div class="coil-corners">
+
+        <div class="coil-corner">
+          <div class="coil-corner-label">FL</div>
+          <div class="coil-bars">
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill accent" id="bar-fl-comp"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-fl-comp">—</div>
+              <div class="coil-bar-sublabel">C</div>
+            </div>
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill dim" id="bar-fl-reb"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-fl-reb">—</div>
+              <div class="coil-bar-sublabel">R</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="coil-corner">
+          <div class="coil-corner-label">FR</div>
+          <div class="coil-bars">
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill accent" id="bar-fr-comp"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-fr-comp">—</div>
+              <div class="coil-bar-sublabel">C</div>
+            </div>
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill dim" id="bar-fr-reb"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-fr-reb">—</div>
+              <div class="coil-bar-sublabel">R</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="coil-corner">
+          <div class="coil-corner-label">RL</div>
+          <div class="coil-bars">
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill accent" id="bar-rl-comp"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-rl-comp">—</div>
+              <div class="coil-bar-sublabel">C</div>
+            </div>
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill dim" id="bar-rl-reb"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-rl-reb">—</div>
+              <div class="coil-bar-sublabel">R</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="coil-corner">
+          <div class="coil-corner-label">RR</div>
+          <div class="coil-bars">
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill accent" id="bar-rr-comp"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-rr-comp">—</div>
+              <div class="coil-bar-sublabel">C</div>
+            </div>
+            <div class="coil-bar-wrap">
+              <div class="coil-bar-track">
+                <div class="coil-bar-fill dim" id="bar-rr-reb"></div>
+              </div>
+              <div class="coil-bar-val" id="txt-rr-reb">—</div>
+              <div class="coil-bar-sublabel">R</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end coil-corners -->
+    </div><!-- end coilover-visual -->
+
+    <!-- Front sliders -->
+    <div class="coil-section-divider">FRONT</div>
+    <div class="field">
+      <label>Compression (clicks from soft)</label>
+      <div class="slider-row">
+        <input type="range" id="f-comp" min="1" max="32" value="1" oninput="updateSlider('f-comp','f-comp-val');updateDials()">
+        <div class="slider-val" id="f-comp-val">16</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Rebound (clicks from soft)</label>
+      <div class="slider-row">
+        <input type="range" id="f-reb" min="1" max="32" value="1" oninput="updateSlider('f-reb','f-reb-val');updateDials()">
+        <div class="slider-val" id="f-reb-val">16</div>
+      </div>
+    </div>
+
+    <!-- Rear sliders -->
+    <div class="coil-section-divider" style="margin-top:14px;">REAR</div>
+    <div class="field">
+      <label>Compression (clicks from soft)</label>
+      <div class="slider-row">
+        <input type="range" id="r-comp" min="1" max="32" value="1" oninput="updateSlider('r-comp','r-comp-val');updateDials()">
+        <div class="slider-val" id="r-comp-val">16</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Rebound (clicks from soft)</label>
+      <div class="slider-row">
+        <input type="range" id="r-reb" min="1" max="32" value="1" oninput="updateSlider('r-reb','r-reb-val');updateDials()">
+        <div class="slider-val" id="r-reb-val">16</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coilovers — Front -->
+  <!-- Coilovers — Rear -->
+
+  <!-- Notes -->
+  <div class="card">
+    <div class="section-label">Driver Notes</div>
+    <div class="field">
+      <label>Car Handling</label>
+      <div class="grid-3">
+        <div class="field" style="margin:0;">
+          <label>Entry</label>
+          <select id="handling-entry">
+            <option value="">—</option>
+            <option>Understeer</option>
+            <option>Balanced</option>
+            <option>Oversteer</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Mid</label>
+          <select id="handling-mid">
+            <option value="">—</option>
+            <option>Understeer</option>
+            <option>Balanced</option>
+            <option>Oversteer</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Exit</label>
+          <select id="handling-exit">
+            <option value="">—</option>
+            <option>Understeer</option>
+            <option>Balanced</option>
+            <option>Oversteer</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Car Behaviour / Feedback</label>
+      <textarea id="notes" placeholder="e.g. Understeer on entry, oversteer on exit of slow corners. Front felt good, rear a bit loose under braking..."></textarea>
+    </div>
+    <div class="field">
+      <label>Changes for Next Session</label>
+      <textarea id="changes" placeholder="e.g. Add 2 clicks rear compression, drop rear ride height 3mm..."></textarea>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="saveSession()">SAVE SESSION</button>
+</div>
+
+<!-- HISTORY PAGE -->
+<div class="page" id="page-history">
+  <div id="history-list"></div>
+</div>
+
+<!-- STATS PAGE -->
+<div class="page" id="page-stats">
+  <div class="stats-tabs">
+    <button class="stats-tab active" onclick="switchStatsTab('bests', this)">Bests</button>
+    <button class="stats-tab" onclick="switchStatsTab('chart', this)">Chart</button>
+    <button class="stats-tab" onclick="switchStatsTab('compare', this)">Compare</button>
+    <button class="stats-tab" onclick="switchStatsTab('delta', this)">Delta</button>
+  </div>
+  <div class="stats-panel active" id="stats-bests"><div id="bests-content"></div></div>
+  <div class="stats-panel" id="stats-chart">
+    <div class="field" style="padding:12px 12px 0;">
+      <label>Track</label>
+      <select id="chart-track-sel" onchange="renderChart()"><option value="">— Select Track —</option></select>
+    </div>
+    <canvas id="lap-chart" style="padding:12px;width:100%;box-sizing:border-box;" height="220"></canvas>
+    <div id="chart-empty" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">No sessions for this track yet</div>
+  </div>
+  <div class="stats-panel" id="stats-compare">
+    <div class="compare-filters" id="compare-filters"></div>
+    <div class="compare-wrap">
+      <table class="compare-table" id="compare-table">
+        <thead id="compare-thead"></thead>
+        <tbody id="compare-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="stats-panel" id="stats-delta">
+    <div style="padding:12px 12px 0;display:flex;gap:8px;">
+      <div class="field" style="flex:1;margin:0;"><label>Session A</label><select id="delta-a" onchange="renderDelta()"><option value="">— Select —</option></select></div>
+      <div class="field" style="flex:1;margin:0;"><label>Session B</label><select id="delta-b" onchange="renderDelta()"><option value="">— Select —</option></select></div>
+    </div>
+    <div id="delta-content" style="padding:12px;"></div>
+  </div>
+</div>
+
+<!-- AI PAGE -->
+<div class="page" id="page-ai">
+  <div class="stats-tabs">
+    <button class="stats-tab active" onclick="switchAiTab('advisor', this)">Advisor</button>
+    <button class="stats-tab" onclick="switchAiTab('trends', this)">Trends</button>
+    <button class="stats-tab" onclick="switchAiTab('autofill', this)">Auto-fill</button>
+    <button class="stats-tab" onclick="switchAiTab('cheat', this)">Cheat</button>
+  </div>
+
+  <div class="ai-panel active" id="ai-advisor">
+    <div style="padding:12px;">
+      <div class="field">
+        <label>Describe your handling problem</label>
+        <textarea id="advisor-problem" rows="4" placeholder="e.g. The car understeers heavily on entry into slow corners and snaps to oversteer mid-corner..."></textarea>
+      </div>
+      <div class="field">
+        <label>Current coilover clicks (optional)</label>
+        <div class="grid-2">
+          <div class="field" style="margin:0;"><label>F. Comp</label><input type="number" id="adv-fcomp" placeholder="16"></div>
+          <div class="field" style="margin:0;"><label>F. Reb</label><input type="number" id="adv-freb" placeholder="16"></div>
+          <div class="field" style="margin:0;"><label>R. Comp</label><input type="number" id="adv-rcomp" placeholder="16"></div>
+          <div class="field" style="margin:0;"><label>R. Reb</label><input type="number" id="adv-rreb" placeholder="16"></div>
+        </div>
+      </div>
+      <button class="btn-ai" style="width:100%;margin-top:4px;" onclick="runAdvisor()">✦ GET RECOMMENDATIONS</button>
+      <div id="advisor-result" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="ai-panel" id="ai-trends">
+    <div style="padding:12px;">
+      <div class="field">
+        <label>Track to analyse (last 3 sessions)</label>
+        <select id="trends-track-sel"><option value="">— Select Track —</option></select>
+      </div>
+      <button class="btn-ai" style="width:100%;margin-top:4px;" onclick="runTrends()">✦ ANALYSE TRENDS</button>
+      <div id="trends-result" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="ai-panel" id="ai-autofill">
+    <div style="padding:12px;">
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6;margin-bottom:12px;">Select a session and AI will suggest what to write in "Changes for Next Session" based on the handling data and notes.</p>
+      <div class="field">
+        <label>Session</label>
+        <select id="autofill-session-sel"><option value="">— Select Session —</option></select>
+      </div>
+      <button class="btn-ai" style="width:100%;margin-top:4px;" onclick="runAutofill()">✦ GENERATE CHANGES</button>
+      <div id="autofill-result" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div class="ai-panel" id="ai-cheat">
+    <div class="cheat-intro">Adjust clicks relative to your current baseline. ↑ = stiffer &nbsp;·&nbsp; ↓ = softer &nbsp;·&nbsp; ↔ = no change</div>
+    <div class="cheat-wrap">
+      <table class="cheat-table">
+        <thead><tr><th>Situation / Problem</th><th>F. Reb</th><th>R. Reb</th><th>F. Comp</th><th>R. Comp</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr class="cheat-group-us"><td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — entry</td><td class="cheat-down">↓ 2-3</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-neutral">↔</td><td class="cheat-why">More weight on front sooner</td></tr>
+          <tr class="cheat-group-us"><td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — mid-corner</td><td class="cheat-neutral">↔</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-up">↑ 1-2</td><td class="cheat-why">More front grip, reduce rear hold</td></tr>
+          <tr class="cheat-group-us"><td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — exit</td><td class="cheat-down">↓ 2</td><td class="cheat-neutral">↔</td><td class="cheat-down">↓ 1</td><td class="cheat-up">↑ 1</td><td class="cheat-why">Helps front traction under throttle</td></tr>
+          <tr class="cheat-group-os"><td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — entry</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 2-3</td><td class="cheat-up">↑ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-why">Keep rear settled under braking</td></tr>
+          <tr class="cheat-group-os"><td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — mid-corner</td><td class="cheat-neutral">↔</td><td class="cheat-down">↓ 1-2</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 1</td><td class="cheat-why">Soften rear grip for balance</td></tr>
+          <tr class="cheat-group-os"><td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — exit</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 2</td><td class="cheat-up">↑ 1</td><td class="cheat-down">↓ 1</td><td class="cheat-why">Discourage rear dive/snap under power</td></tr>
+          <tr><td class="cheat-situation"><span class="cheat-badge other">⚡</span>High-speed instability</td><td class="cheat-up">↑ 1</td><td class="cheat-up">↑ 1</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-why">Adds stability front &amp; rear</td></tr>
+          <tr><td class="cheat-situation"><span class="cheat-badge other">⚡</span>Harsh bumps / curbs</td><td class="cheat-down">↓ 1-2</td><td class="cheat-down">↓ 1-2</td><td class="cheat-down">↓ 2-3</td><td class="cheat-down">↓ 2-3</td><td class="cheat-why">Soaks up rough surfaces</td></tr>
+          <tr><td class="cheat-situation"><span class="cheat-badge other">⚡</span>Track very smooth</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-neutral">↔</td><td class="cheat-why">Keep near baseline</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP PAGE -->
+<div class="page" id="page-setup">
+
+  <div class="card">
+    <div class="section-label">Tracks</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <input type="text" id="s-track-input" placeholder="Track name" style="flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:10px 12px;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <input type="number" id="s-track-lat" placeholder="Latitude" step="any" style="background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.85rem;padding:8px 10px;width:100%;min-width:0;">
+      <input type="number" id="s-track-lng" placeholder="Longitude" step="any" style="background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:0.85rem;padding:8px 10px;width:100%;min-width:0;">
+    </div>
+    <button onclick="useGpsForTrack()" title="Use my current location" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--accent);border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.75rem;letter-spacing:2px;padding:9px;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;">
+      📍 USE MY CURRENT LOCATION
+    </button>
+    <button onclick="addTrack()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:2px;padding:10px;cursor:pointer;margin-bottom:12px;">ADD TRACK</button>
+    <div id="s-track-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Front Tire Sizes</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="s-tire-front-input" placeholder="e.g. 245/40R17" style="flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:10px 12px;">
+      <button onclick="addTireFront()" style="background:var(--accent);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:2px;padding:0 16px;cursor:pointer;white-space:nowrap;">ADD</button>
+    </div>
+    <div id="s-tire-front-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Rear Tire Sizes</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="s-tire-rear-input" placeholder="e.g. 265/40R17" style="flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:10px 12px;">
+      <button onclick="addTireRear()" style="background:var(--accent);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:2px;padding:0 16px;cursor:pointer;white-space:nowrap;">ADD</button>
+    </div>
+    <div id="s-tire-rear-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Tire Models</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="s-tire-model-input" placeholder="e.g. Hoosier R7, Michelin Cup2" style="flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:10px 12px;">
+      <button onclick="addTireModel()" style="background:var(--accent);color:#000;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.85rem;letter-spacing:2px;padding:0 16px;cursor:pointer;white-space:nowrap;">ADD</button>
+    </div>
+    <div id="s-tire-model-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Car Profiles</div>
+
+    <!-- Profile list -->
+    <div id="s-profile-list" style="margin-bottom:12px;"></div>
+
+    <!-- Profile form -->
+    <div id="s-profile-form" style="border-top:1px solid var(--border);padding-top:12px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px;" id="s-profile-form-title">NEW PROFILE</div>
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="p-name" placeholder="e.g. BMW #42 Race Setup">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Make</label>
+          <input type="text" id="p-make" placeholder="BMW">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="p-model" placeholder="M4 GT4">
+        </div>
+      </div>
+      <div class="field">
+        <label>Year</label>
+        <input type="number" id="p-year" placeholder="2023">
+      </div>
+      <div class="field">
+        <label>Coilover</label>
+        <input type="text" id="p-coilover" placeholder="e.g. Öhlins TTX, Bilstein GT3">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Spring Rate Front</label>
+          <input type="text" id="p-spring-f" placeholder="450 lbs/in">
+        </div>
+        <div class="field">
+          <label>Spring Rate Rear</label>
+          <input type="text" id="p-spring-r" placeholder="350 lbs/in">
+        </div>
+      </div>
+      <div class="field">
+        <label>Weight (lbs)</label>
+        <input type="number" id="p-weight" placeholder="2756">
+      </div>
+      <div class="field">
+        <label>Note</label>
+        <textarea id="p-note" placeholder="Any relevant notes about this car profile..."></textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-primary" style="margin-top:0;" onclick="saveProfile()">SAVE PROFILE</button>
+        <button id="p-cancel-btn" onclick="cancelProfileEdit()" style="display:none;flex:0 0 auto;padding:14px 16px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:2px;cursor:pointer;margin-top:0;">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Coilover Click Range</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>F. Compression</label>
+        <input type="number" id="s-f-comp-max" min="1" max="99" placeholder="32" oninput="updateSliderMax('f-comp','f-comp-val',this.value)">
+      </div>
+      <div class="field">
+        <label>F. Rebound</label>
+        <input type="number" id="s-f-reb-max" min="1" max="99" placeholder="32" oninput="updateSliderMax('f-reb','f-reb-val',this.value)">
+      </div>
+      <div class="field">
+        <label>R. Compression</label>
+        <input type="number" id="s-r-comp-max" min="1" max="99" placeholder="32" oninput="updateSliderMax('r-comp','r-comp-val',this.value)">
+      </div>
+      <div class="field">
+        <label>R. Rebound</label>
+        <input type="number" id="s-r-reb-max" min="1" max="99" placeholder="32" oninput="updateSliderMax('r-reb','r-reb-val',this.value)">
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:8px;" onclick="saveClickSettings()">SAVE CLICK SETTINGS</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Events / Weekends</div>
+    <div id="setup-event-list">
+      <div style="color:var(--muted);font-size:0.82rem;padding:8px 0;">No events yet.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Appearance</div>
+    <div class="field" style="margin:0;">
+      <label>Theme</label>
+      <div class="theme-toggle-row">
+        <button class="theme-btn active" id="theme-btn-dark" onclick="setTheme('dark')">
+          <span class="theme-btn-icon">🌑</span>
+          <span class="theme-btn-label">Dark</span>
+        </button>
+        <button class="theme-btn" id="theme-btn-light" onclick="setTheme('light')">
+          <span class="theme-btn-icon">☀️</span>
+          <span class="theme-btn-label">Light</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Accent Color</div>
+    <div class="field">
+      <label>App Accent Color</label>
+      <div class="color-picker-row">
+        <input type="color" id="accent-color-picker" value="#e8ff00" oninput="previewAccent(this.value)">
+        <div class="color-presets" id="color-presets">
+          <div class="color-preset" style="background:#e8ff00" onclick="setAccent('#e8ff00')" title="Yellow"></div>
+          <div class="color-preset" style="background:#00e5ff" onclick="setAccent('#00e5ff')" title="Cyan"></div>
+          <div class="color-preset" style="background:#ff4d00" onclick="setAccent('#ff4d00')" title="Orange"></div>
+          <div class="color-preset" style="background:#00ff88" onclick="setAccent('#00ff88')" title="Green"></div>
+          <div class="color-preset" style="background:#bf5fff" onclick="setAccent('#bf5fff')" title="Purple"></div>
+          <div class="color-preset" style="background:#ff2d6b" onclick="setAccent('#ff2d6b')" title="Pink"></div>
+          <div class="color-preset" style="background:#ffffff" onclick="setAccent('#ffffff')" title="White"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:8px;" onclick="saveAccentColor()">SAVE COLOR</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">AI Debrief</div>
+    <div class="field">
+      <label>Anthropic API Key</label>
+      <input type="password" id="s-api-key" placeholder="AIza..." oninput="saveApiKey(this.value)">
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:6px;line-height:1.5;">Get your free key at <strong style="color:var(--text)">aistudio.google.com</strong> → Get API Key. No credit card needed. Stored locally on your device only.</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="btn-primary" style="margin-top:0;flex:1;" onclick="testApiKey()">TEST API KEY</button>
+      <div id="api-test-status" style="font-size:0.8rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;"></div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="saveSetup()">SAVE SETUP</button>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Session</div>
+      <button class="close-btn" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button class="btn-danger" onclick="deleteCurrentSession()">DELETE SESSION</button>
+      <button class="btn-ai" onclick="runDebrief()">✦ AI DEBRIEF</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Debrief Modal -->
+<div class="modal-overlay" id="debrief-overlay">
+  <div class="modal" id="debrief-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">✦ AI Debrief</div>
+      <button class="close-btn" onclick="closeDebrief()">✕</button>
+    </div>
+    <div id="debrief-body">
+      <div class="debrief-loading" id="debrief-loading">
+        <div class="debrief-spinner"></div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:12px;">Analysing session...</div>
+      </div>
+      <div id="debrief-result" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit Event Modal -->
+<div class="modal-overlay" id="edit-event-overlay" onclick="closeEditEvent()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:60vh;">
+    <div class="modal-header">
+      <div class="modal-title">Edit Event</div>
+      <button class="close-btn" onclick="closeEditEvent()">✕</button>
+    </div>
+    <div class="field">
+      <label>Event Name</label>
+      <input type="text" id="edit-event-input" style="width:100%;">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn-primary" style="margin:0;flex:1;" onclick="saveEditEvent()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Session Saved!</div>
+
+<script>
+let sessions = JSON.parse(localStorage.getItem('pitlog_sessions') || '[]');
+let setupData = JSON.parse(localStorage.getItem('pitlog_setup') || '{}');
+// ── Tracks (with GPS) ────────────────────────────────────
+// Migrate old string array to object array
+let trackData = (() => {
+  const raw = JSON.parse(localStorage.getItem('pitlog_tracks') || '[]');
+  if (raw.length === 0) return [];
+  // If already objects, use as-is; if strings, migrate
+  if (typeof raw[0] === 'string') {
+    return raw.map(name => ({ name, lat: null, lng: null }));
+  }
+  return raw;
+})();
+
+// Keep a simple name array in sync for backwards compat
+let tracks = trackData.map(t => t.name);
+
+function saveTrackData() {
+  localStorage.setItem('pitlog_tracks', JSON.stringify(trackData));
+  tracks = trackData.map(t => t.name);
+}
+
+function addTrack() {
+  const nameInput = document.getElementById('s-track-input');
+  const latInput  = document.getElementById('s-track-lat');
+  const lngInput  = document.getElementById('s-track-lng');
+  const name = nameInput.value.trim();
+  if (!name) { showToast('ENTER A TRACK NAME'); return; }
+  if (trackData.find(t => t.name === name)) { showToast('TRACK ALREADY EXISTS'); return; }
+  const lat = latInput?.value ? parseFloat(latInput.value) : null;
+  const lng = lngInput?.value ? parseFloat(lngInput.value) : null;
+  trackData.push({ name, lat, lng });
+  trackData.sort((a, b) => a.name.localeCompare(b.name));
+  saveTrackData();
+  nameInput.value = '';
+  if (latInput) latInput.value = '';
+  if (lngInput) lngInput.value = '';
+  renderTrackList();
+  populateTrackDropdown();
+  haptic('success');
+  showToast('TRACK ADDED ✓');
+}
+
+function deleteTrack(name) {
+  trackData = trackData.filter(t => t.name !== name);
+  saveTrackData();
+  renderTrackList();
+  populateTrackDropdown();
+}
+
+function renderTrackList() {
+  const container = document.getElementById('s-track-list');
+  if (!container) return;
+  if (trackData.length === 0) {
+    container.innerHTML = '<div class="track-empty">No tracks added yet. Add coordinates so the app can suggest the nearest track.</div>';
+    return;
+  }
+  container.innerHTML = trackData.map(t => {
+    const hasGps = t.lat && t.lng;
+    return `
+      <div class="track-item">
+        <div>
+          <span class="t-name">🏁 ${t.name}</span>
+          <span class="track-gps-badge ${hasGps ? 'has-gps' : ''}">${hasGps ? '📍 GPS' : '· no GPS'}</span>
+        </div>
+        <button class="track-del" onclick="deleteTrack('${t.name.replace(/'/g, "\\'")}')">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function populateTrackDropdown() {
+  const sel = document.getElementById('track');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select a track —</option>' +
+    trackData.map(t => `<option value="${t.name}"${t.name === current ? ' selected' : ''}>${t.name}</option>`).join('');
+}
+
+// ── GPS: use current location to fill lat/lng fields ────
+function useGpsForTrack() {
+  if (!navigator.geolocation) { showToast('GPS NOT SUPPORTED'); return; }
+  showToast('GETTING LOCATION…');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude.toFixed(5);
+    const lng = pos.coords.longitude.toFixed(5);
+    const latEl = document.getElementById('s-track-lat');
+    const lngEl = document.getElementById('s-track-lng');
+    if (latEl) latEl.value = lat;
+    if (lngEl) lngEl.value = lng;
+    showToast('LOCATION CAPTURED ✓');
+    haptic('success');
+  }, () => { showToast('LOCATION DENIED'); });
+}
+
+// ── GPS: find nearest track ───────────────────────────────
+function findNearestTrack() {
+  const btn = document.getElementById('gps-track-btn');
+  const status = document.getElementById('gps-track-status');
+  const gpsEnabled = trackData.some(t => t.lat && t.lng);
+
+  if (!gpsEnabled) {
+    if (status) {
+      status.style.display = 'block';
+      status.textContent = '⚠ No tracks have GPS coordinates yet — add them in Setup.';
+    }
+    return;
+  }
+
+  if (!navigator.geolocation) { showToast('GPS NOT SUPPORTED'); return; }
+
+  if (btn) btn.textContent = '⏳';
+  if (status) { status.style.display = 'block'; status.textContent = 'Getting your location…'; }
+
+  navigator.geolocation.getCurrentPosition(pos => {
+    const myLat = pos.coords.latitude;
+    const myLng = pos.coords.longitude;
+
+    // Haversine distance in km
+    function dist(lat1, lng1, lat2, lng2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    const withGps = trackData.filter(t => t.lat && t.lng);
+    const sorted = withGps.map(t => ({
+      ...t,
+      km: dist(myLat, myLng, t.lat, t.lng)
+    })).sort((a, b) => a.km - b.km);
+
+    const nearest = sorted[0];
+    const kmStr = nearest.km < 1 ? `${Math.round(nearest.km * 1000)}m` : `${nearest.km.toFixed(1)}km`;
+
+    // Auto-select in dropdown
+    const sel = document.getElementById('track');
+    if (sel) {
+      sel.value = nearest.name;
+      if (!sel.value) { // not in list yet — shouldn't happen
+        showToast('TRACK NOT IN LIST');
+      }
+    }
+
+    if (btn) btn.textContent = '📍';
+    if (status) {
+      status.style.display = 'block';
+      status.innerHTML = `📍 Nearest: <strong style="color:var(--accent)">${nearest.name}</strong> — ${kmStr} away${sorted.length > 1 ? ` &nbsp;·&nbsp; Next: ${sorted[1].name} (${sorted[1].km.toFixed(1)}km)` : ''}`;
+    }
+    haptic('success');
+  }, () => {
+    if (btn) btn.textContent = '📍';
+    if (status) { status.style.display = 'block'; status.textContent = '⚠ Location access denied.'; }
+  });
+}
+
+// ── Coilover Dial Visual ─────────────────────────────────
+function updateDials() {
+  const fComp = parseInt(document.getElementById('f-comp')?.value) || 0;
+  const fReb  = parseInt(document.getElementById('f-reb')?.value)  || 0;
+  const rComp = parseInt(document.getElementById('r-comp')?.value) || 0;
+  const rReb  = parseInt(document.getElementById('r-reb')?.value)  || 0;
+  const fMax  = parseInt(document.getElementById('f-comp')?.max)   || 32;
+  const rMax  = parseInt(document.getElementById('r-comp')?.max)   || 32;
+
+  function setBar(compBarId, rebBarId, compTxtId, rebTxtId, compVal, rebVal, maxVal) {
+    const compBar = document.getElementById(compBarId);
+    const rebBar  = document.getElementById(rebBarId);
+    const compTxt = document.getElementById(compTxtId);
+    const rebTxt  = document.getElementById(rebTxtId);
+    const compPct = Math.round((compVal / maxVal) * 100);
+    const rebPct  = Math.round((rebVal  / maxVal) * 100);
+    if (compBar) compBar.style.height = compPct + '%';
+    if (rebBar)  rebBar.style.height  = rebPct  + '%';
+    if (compTxt) compTxt.textContent  = compVal;
+    if (rebTxt)  rebTxt.textContent   = rebVal;
+  }
+
+  // Front left & right share same values; same for rear
+  setBar('bar-fl-comp','bar-fl-reb','txt-fl-comp','txt-fl-reb', fComp, fReb, fMax);
+  setBar('bar-fr-comp','bar-fr-reb','txt-fr-comp','txt-fr-reb', fComp, fReb, fMax);
+  setBar('bar-rl-comp','bar-rl-reb','txt-rl-comp','txt-rl-reb', rComp, rReb, rMax);
+  setBar('bar-rr-comp','bar-rr-reb','txt-rr-comp','txt-rr-reb', rComp, rReb, rMax);
+}
+
+// ── Auto-fill Weather from GPS + Open-Meteo ───────────────
+async function fetchWeather() {
+  const btn  = document.getElementById('weather-fetch-btn');
+  const icon = document.getElementById('weather-fetch-icon');
+  const status = document.getElementById('weather-status');
+
+  if (!navigator.geolocation) { showToast('GPS NOT SUPPORTED'); return; }
+
+  // Loading state
+  icon.textContent = '⏳';
+  btn.style.opacity = '0.6';
+  if (status) { status.style.display = 'block'; status.textContent = 'Getting your location…'; }
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = pos.coords.latitude.toFixed(4);
+    const lon = pos.coords.longitude.toFixed(4);
+
+    if (status) status.textContent = `📍 ${lat}, ${lon} — fetching weather…`;
+
+    try {
+      // Open-Meteo: free, no API key, returns current weather
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,precipitation&timezone=auto`;
+      const res  = await fetch(url);
+      if (!res.ok) throw new Error('Weather API error');
+      const data = await res.json();
+
+      const temp    = Math.round(data.current.temperature_2m);
+      const code    = data.current.weathercode;
+      const precip  = data.current.precipitation;
+
+      // WMO weather code → our 4 conditions
+      // https://open-meteo.com/en/docs#weathervariables
+      let condition = 'Cloudy';
+      if (code === 0) condition = 'Sunny';                          // Clear sky
+      else if (code <= 2) condition = 'Sunny';                     // Mainly clear / partly cloudy
+      else if (code === 3) condition = 'Cloudy';                   // Overcast
+      else if (code <= 49) condition = 'Cloudy';                   // Fog / depositing rime
+      else if (code <= 55) condition = precip > 0 ? 'Wet' : 'Mixed'; // Drizzle
+      else if (code <= 67) condition = 'Wet';                      // Rain
+      else if (code <= 77) condition = 'Cloudy';                   // Snow
+      else if (code <= 82) condition = 'Wet';                      // Rain showers
+      else if (code <= 99) condition = 'Wet';                      // Thunderstorm
+
+      // If it was raining but stopped, suggest Drying
+      if (precip === 0 && (code >= 51 && code <= 82)) condition = 'Mixed';
+
+      // Condition label map for display
+      const conditionLabels = {
+        Sunny: '☀️ Sunny', Cloudy: '⛅ Cloudy', Wet: '🌧️ Wet', Mixed: '🌤️ Mixed'
+      };
+
+      // Apply temp (clamp to slider range)
+      const clampedTemp = Math.max(-5, Math.min(35, temp));
+      const airTempEl = document.getElementById('air-temp');
+      const airTempVal = document.getElementById('air-temp-val');
+      if (airTempEl) { airTempEl.value = clampedTemp; }
+      if (airTempVal) { airTempVal.textContent = clampedTemp; }
+
+      // Apply weather condition
+      const weatherBtns = document.querySelectorAll('.weather-btn');
+      weatherBtns.forEach(b => {
+        const label = b.querySelector('.wlabel')?.textContent;
+        if (label === condition) {
+          b.classList.add('selected');
+          selectedWeather = condition;
+        } else {
+          b.classList.remove('selected');
+        }
+      });
+
+      // Status message
+      if (status) {
+        status.style.display = 'block';
+        status.innerHTML = `${conditionLabels[condition]} · <strong>${temp}°C</strong> · Precipitation: ${precip}mm`;
+      }
+
+      haptic('success');
+      showToast('WEATHER UPDATED ✓');
+
+    } catch (e) {
+      if (status) { status.style.display = 'block'; status.textContent = '⚠ Could not fetch weather. Check your connection.'; }
+      showToast('WEATHER FETCH FAILED');
+    }
+
+    icon.textContent = '📍';
+    btn.style.opacity = '1';
+
+  }, () => {
+    icon.textContent = '📍';
+    btn.style.opacity = '1';
+    if (status) { status.style.display = 'block'; status.textContent = '⚠ Location access denied.'; }
+    showToast('LOCATION DENIED');
+  });
+}
+
+// ── Swipe to Delete ───────────────────────────────────────
+function initSwipe() {
+  const THRESHOLD = 80; // px to trigger delete
+  const MAX_DRAG  = 120;
+
+  document.querySelectorAll('.swipe-card').forEach(card => {
+    // Skip if already initialised
+    if (card._swipeInit) return;
+    card._swipeInit = true;
+
+    const wrap = card.closest('.swipe-wrap');
+    let startX = 0, startY = 0, currentX = 0, isDragging = false, isHorizontal = null;
+
+    function onStart(clientX, clientY) {
+      startX = clientX;
+      startY = clientY;
+      currentX = 0;
+      isDragging = true;
+      isHorizontal = null;
+      card.classList.add('dragging');
+    }
+
+    function onMove(clientX, clientY) {
+      if (!isDragging) return;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      // Determine direction lock on first move
+      if (isHorizontal === null) {
+        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+        isHorizontal = Math.abs(dx) > Math.abs(dy);
+        if (!isHorizontal) { isDragging = false; card.classList.remove('dragging'); return; }
+      }
+      if (!isHorizontal) return;
+
+      // Only allow leftward swipe
+      currentX = Math.max(-MAX_DRAG, Math.min(0, dx));
+      card.style.transform = `translateX(${currentX}px)`;
+
+      const progress = Math.abs(currentX) / THRESHOLD;
+      wrap.classList.toggle('revealing', progress > 0.3);
+    }
+
+    function onEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      card.classList.remove('dragging');
+
+      if (currentX <= -THRESHOLD) {
+        // Commit delete
+        swipeDelete(card.dataset.id, wrap, card);
+      } else {
+        // Snap back
+        card.style.transform = '';
+        wrap.classList.remove('revealing');
+      }
+    }
+
+    // Touch events
+    card.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    card.addEventListener('touchmove',  e => { onMove(e.touches[0].clientX, e.touches[0].clientY); if (isHorizontal) e.preventDefault(); }, { passive: false });
+    card.addEventListener('touchend',   () => onEnd());
+
+    // Mouse events (desktop testing)
+    card.addEventListener('mousedown', e => { onStart(e.clientX, e.clientY); });
+    document.addEventListener('mousemove', e => { if (isDragging) onMove(e.clientX, e.clientY); });
+    document.addEventListener('mouseup',   () => { if (isDragging) onEnd(); });
+  });
+}
+
+function swipeDelete(id, wrap, card) {
+  haptic('medium');
+
+  // Animate card off screen
+  card.classList.add('deleting');
+
+  // After card slides out, collapse the row height
+  setTimeout(() => {
+    const h = wrap.offsetHeight;
+    wrap.style.maxHeight = h + 'px';
+    wrap.style.overflow = 'hidden';
+    // Force reflow then animate to 0
+    wrap.offsetHeight; // eslint-disable-line
+    wrap.style.maxHeight = '0';
+    wrap.style.marginBottom = '0';
+    wrap.style.opacity = '0';
+    wrap.style.transition = 'max-height 0.28s ease, margin-bottom 0.28s ease, opacity 0.2s ease';
+  }, 280);
+
+  // After collapse remove from DOM and data
+  setTimeout(() => {
+    sessions = sessions.filter(s => s.id != id);
+    localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+    wrap.remove();
+    showToast('SESSION DELETED');
+    renderHome(); // refresh home stats
+  }, 580);
+}
+
+// ── Events ────────────────────────────────────────────────
+let events = JSON.parse(localStorage.getItem('pitlog_events') || '[]');
+
+function saveEvents() {
+  localStorage.setItem('pitlog_events', JSON.stringify(events));
+}
+
+// Get all unique event names, sorted by most recent date extracted from name
+function getAllEventsSorted() {
+  const fromSessions = [...new Set(sessions.map(s => s.event).filter(Boolean))];
+  const all = [...new Set([...events, ...fromSessions])];
+  // Sort by date embedded in name "[Track] - [YYYY-MM-DD]", most recent first
+  return all.sort((a, b) => {
+    const dA = extractDateFromEvent(a);
+    const dB = extractDateFromEvent(b);
+    if (dA && dB) return dB.localeCompare(dA);
+    if (dA) return -1;
+    if (dB) return 1;
+    return a.localeCompare(b);
+  });
+}
+
+function extractDateFromEvent(name) {
+  const m = name.match(/(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
+// Populate the <select> dropdown on the log page
+function populateEventSelect() {
+  const sel = document.getElementById('event');
+  if (!sel) return;
+  const current = sel.value;
+  const all = getAllEventsSorted();
+  sel.innerHTML = '<option value="">— Select or create event —</option>' +
+    all.map(e => `<option value="${e}"${e === current ? ' selected' : ''}>${e}</option>`).join('');
+}
+
+// Alias kept for any legacy calls
+function populateEventDatalist() { populateEventSelect(); }
+
+// Quick-create: builds "[Track] - [Date]" from current selections
+function quickCreateEvent() {
+  const track = document.getElementById('track')?.value?.trim();
+  const date  = document.getElementById('date')?.value?.trim();
+
+  if (!track && !date) {
+    const st = document.getElementById('event-create-status');
+    if (st) { st.style.display = 'block'; st.textContent = '⚠ Select a track and date first'; }
+    return;
+  }
+
+  const trackPart = track || 'Event';
+  const datePart  = date  || new Date().toISOString().slice(0, 10);
+  const name = `${trackPart} - ${datePart}`;
+
+  if (!events.includes(name)) {
+    events.push(name);
+    saveEvents();
+  }
+
+  populateEventSelect();
+
+  // Auto-select the new event
+  const sel = document.getElementById('event');
+  if (sel) sel.value = name;
+
+  const st = document.getElementById('event-create-status');
+  if (st) { st.style.display = 'block'; st.textContent = `✓ Created: ${name}`; }
+
+  haptic('success');
+  showToast('EVENT CREATED ✓');
+  renderSetupEventList();
+}
+
+function deleteEvent(name) {
+  if (!confirm(`Delete event "${name}"?\n\nSessions using this event will become ungrouped.`)) return;
+  events = events.filter(e => e !== name);
+  // Also clear from sessions
+  sessions.forEach(s => { if (s.event === name) s.event = ''; });
+  localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  saveEvents();
+  populateEventSelect();
+  renderSetupEventList();
+  showToast('EVENT DELETED');
+}
+
+// ── Edit Event ────────────────────────────────────────────
+let _editingEventName = null;
+
+function openEditEvent(name) {
+  _editingEventName = name;
+  const input = document.getElementById('edit-event-input');
+  if (input) input.value = name;
+  document.getElementById('edit-event-overlay').classList.add('active');
+}
+
+function closeEditEvent() {
+  document.getElementById('edit-event-overlay').classList.remove('active');
+  _editingEventName = null;
+}
+
+function saveEditEvent() {
+  const newName = document.getElementById('edit-event-input')?.value?.trim();
+  if (!newName || !_editingEventName) return;
+  if (newName === _editingEventName) { closeEditEvent(); return; }
+
+  // Rename in events list
+  const idx = events.indexOf(_editingEventName);
+  if (idx !== -1) events[idx] = newName;
+  else events.push(newName);
+
+  // Rename in all sessions
+  sessions.forEach(s => { if (s.event === _editingEventName) s.event = newName; });
+  localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  saveEvents();
+
+  populateEventSelect();
+  renderSetupEventList();
+  closeEditEvent();
+  showToast('EVENT RENAMED ✓');
+  haptic('success');
+}
+
+// ── Setup event list ──────────────────────────────────────
+function renderSetupEventList() {
+  const container = document.getElementById('setup-event-list');
+  if (!container) return;
+  const all = getAllEventsSorted();
+  if (all.length === 0) {
+    container.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;padding:8px 0;">No events yet. Create one from the New Session form.</div>';
+    return;
+  }
+  container.innerHTML = all.map(name => {
+    const count = sessions.filter(s => s.event === name).length;
+    const date  = extractDateFromEvent(name);
+    const safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `
+      <div class="event-mgr-row">
+        <div style="flex:1;min-width:0;">
+          <div class="event-mgr-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📅 ${name}</div>
+          <div class="event-mgr-count">${count} session${count !== 1 ? 's' : ''}${date ? ' · ' + date : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="openEditEvent('${safeName}')"
+            style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.62rem;letter-spacing:1px;padding:5px 10px;cursor:pointer;white-space:nowrap;">
+            ✏ EDIT
+          </button>
+          <button onclick="deleteEvent('${safeName}')"
+            style="background:none;border:1px solid rgba(255,80,80,0.25);color:#ff5050;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.62rem;letter-spacing:1px;padding:5px 10px;cursor:pointer;">
+            ✕
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// Legacy stubs no longer needed but kept to avoid errors if referenced
+function showEventManager() {}
+function closeEventManager() {}
+function addEvent() {}
+function renderEventManagerList() {}
+function prefillEvent(name) {
+  const sel = document.getElementById('event');
+  if (sel) sel.value = name;
+}
+
+// ── allow pressing Enter to add track ────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const ti = document.getElementById('s-track-input');
+  if (ti) ti.addEventListener('keydown', e => { if (e.key === 'Enter') addTrack(); });
+});
+let currentModalId = null;
+
+const pageTitles = { log: 'New Session', history: 'History', setup: 'Setup' };
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const navId = page === 'log' ? 'nav-home' : 'nav-' + page;
+  const btn = document.getElementById(navId);
+  if (btn) {
+    btn.classList.add('active');
+    btn.classList.remove('popping');
+    void btn.offsetWidth;
+    btn.classList.add('popping');
+    btn.addEventListener('animationend', () => btn.classList.remove('popping'), { once: true });
+  }
+  const titles = { home: 'TrackLogger', log: 'New Session', history: 'Sessions', stats: 'Stats', ai: 'AI', setup: 'Setup' };
+  document.getElementById('header-title').textContent = titles[page] || page;
+  if (page === 'home') renderHome();
+  if (page === 'history') { renderHistory(); populateEventSelect(); initSwipe(); }
+  if (page === 'setup') { loadSetupForm(); loadTheme(); }
+  if (page === 'stats') renderStats();
+  if (page === 'ai') renderAiPage();
+}
+
+function saveSetup() {
+  showToast('SETUP SAVED ✓');
+}
+
+let carProfiles = JSON.parse(localStorage.getItem('pitlog_profiles') || '[]');
+let editingProfileId = null;
+
+// ── AI Debrief ────────────────────────────────────────────
+function saveApiKey(val) {
+  localStorage.setItem('pitlog_apikey', val.trim());
+}
+
+async function testApiKey() {
+  const apiKey = localStorage.getItem('pitlog_apikey') || '';
+  if (!apiKey) { showToast('ENTER AN API KEY FIRST'); return; }
+
+  const statusEl = document.getElementById('api-test-status');
+  statusEl.textContent = 'TESTING...';
+  statusEl.style.color = 'var(--muted)';
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: 'Say OK.' }] }]
+      })
+    });
+
+    if (response.ok) {
+      statusEl.textContent = '✓ CONNECTED';
+      statusEl.style.color = '#00cc66';
+    } else {
+      statusEl.textContent = '✕ INVALID KEY';
+      statusEl.style.color = '#ff4d4d';
+    }
+  } catch (err) {
+    statusEl.textContent = '✕ ERROR';
+    statusEl.style.color = '#ff4d4d';
+  }
+
+  setTimeout(() => { statusEl.textContent = ''; }, 4000);
+}
+
+function loadApiKeyForm() {
+  const key = localStorage.getItem('pitlog_apikey') || '';
+  const el = document.getElementById('s-api-key');
+  if (el) el.value = key;
+}
+
+function closeDebrief() {
+  document.getElementById('debrief-overlay').classList.remove('active');
+}
+
+async function runDebrief() {
+  const apiKey = localStorage.getItem('pitlog_apikey') || '';
+  if (!apiKey) {
+    alert('Please enter your Gemini API key in the Setup page first.');
+    return;
+  }
+
+  const s = sessions.find(x => x.id == currentModalId);
+  if (!s) return;
+
+  // Show debrief modal
+  document.getElementById('debrief-overlay').classList.add('active');
+  document.getElementById('debrief-loading').style.display = 'flex';
+  document.getElementById('debrief-result').style.display = 'none';
+  document.getElementById('debrief-result').innerHTML = '';
+
+  // Build session summary for the prompt
+  const sessionInfo = `
+Track: ${s.track || '—'}
+Date: ${s.date || '—'}
+Best Lap: ${s.laptime || '—'}
+Car Profile: ${s.carProfile || '—'}
+Front Tire: ${s.tireFront || '—'}
+Rear Tire: ${s.tireRear || '—'}
+Tire Model: ${s.tireModel || '—'}
+Weather: ${s.weather || '—'}
+Air Temp: ${s.airTemp ? s.airTemp + '°C' : '—'}
+Track State: ${s.trackState || '—'}
+Front Compression: ${s.suspension?.frontComp || '—'} clicks
+Front Rebound: ${s.suspension?.frontReb || '—'} clicks
+Rear Compression: ${s.suspension?.rearComp || '—'} clicks
+Rear Rebound: ${s.suspension?.rearReb || '—'} clicks
+Handling — Entry: ${s.handling?.entry || '—'}
+Handling — Mid: ${s.handling?.mid || '—'}
+Handling — Exit: ${s.handling?.exit || '—'}
+Driver Notes: ${s.notes || '—'}
+Changes Noted: ${s.changes || '—'}
+  `.trim();
+
+  const prompt = `You are an expert motorsport engineer analyzing a race session debrief. Based on the session data below, provide a concise structured analysis.
+
+SESSION DATA:
+${sessionInfo}
+
+Respond in this exact JSON format (no markdown, no code blocks, just raw JSON):
+{
+  "summary": "2-3 sentence overall assessment of the session",
+  "handling_analysis": "1-2 sentences interpreting the entry/mid/exit handling data and what it means for setup",
+  "priority_changes": [
+    "Specific change 1 with exact click adjustment if possible",
+    "Specific change 2",
+    "Specific change 3"
+  ],
+  "positive": "What was working well this session",
+  "watch_next": "One key thing to monitor in the next session"
+}`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.4 }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || `API error ${response.status}`);
+    }
+
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch {
+      throw new Error('Could not parse AI response. Try again.');
+    }
+
+    const html = `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Overall Assessment</div>
+        <div class="debrief-text">${parsed.summary}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Handling Analysis</div>
+        <div class="debrief-text">${parsed.handling_analysis}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Priority Changes for Next Session</div>
+        ${parsed.priority_changes.map(c => `
+          <div class="debrief-item">
+            <span class="debrief-bullet">→</span>
+            <span>${c}</span>
+          </div>`).join('')}
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">What's Working</div>
+        <div class="debrief-text">${parsed.positive}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Watch Next Session</div>
+        <div class="debrief-text">${parsed.watch_next}</div>
+      </div>
+    `;
+
+    document.getElementById('debrief-loading').style.display = 'none';
+    document.getElementById('debrief-result').style.display = 'block';
+    document.getElementById('debrief-result').innerHTML = html;
+
+  } catch (err) {
+    document.getElementById('debrief-loading').style.display = 'none';
+    document.getElementById('debrief-result').style.display = 'block';
+    document.getElementById('debrief-result').innerHTML = `
+      <div class="debrief-error">
+        ⚠ ${err.message}<br><br>
+        Check your API key in Setup and try again.
+      </div>`;
+  }
+}
+
+// ── Home Page ─────────────────────────────────────────────
+function renderHome() {
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const el = document.getElementById('home-greeting');
+  if (el) el.textContent = greet;
+
+  const statsRow = document.getElementById('home-stats-row');
+  if (statsRow) {
+    const tracks = new Set(sessions.map(s => s.track).filter(Boolean)).size;
+    const totalLaps = sessions.filter(s => s.laptime).length;
+    statsRow.innerHTML = `
+      <div class="home-stat-card">
+        <div class="home-stat-val">${sessions.length}</div>
+        <div class="home-stat-label">Sessions</div>
+      </div>
+      <div class="home-stat-card">
+        <div class="home-stat-val">${tracks}</div>
+        <div class="home-stat-label">Tracks</div>
+      </div>
+      <div class="home-stat-card">
+        <div class="home-stat-val">${totalLaps}</div>
+        <div class="home-stat-label">Timed Laps</div>
+      </div>`;
+  }
+
+  const lastEl = document.getElementById('home-last-session');
+  if (lastEl) {
+    if (sessions.length === 0) {
+      lastEl.innerHTML = `
+        <div class="home-section-title">Last Session</div>
+        <div class="home-empty"><div class="big">🏁</div>No sessions yet.<br>Tap New Session to get started.</div>`;
+    } else {
+      const s = sessions[0];
+      const num = sessions.length;
+      const hEntry = s.handling?.entry || '—';
+      const hMid   = s.handling?.mid   || '—';
+      const hExit  = s.handling?.exit  || '—';
+      lastEl.innerHTML = `
+        <div class="home-section-title">Last Session</div>
+        <div class="home-last-card" onclick="openModal(${s.id})">
+          <div class="home-last-top">
+            <div>
+              <div style="font-size:0.6rem;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:2px;margin-bottom:4px;">#${num} · ${s.date || ''}</div>
+              <div class="home-last-track">${s.track || '—'}</div>
+            </div>
+            ${s.laptime ? `<div class="home-last-lap">${s.laptime}</div>` : ''}
+          </div>
+          <div class="home-last-body">
+            ${s.carProfile ? `<div class="home-last-row"><span class="home-last-key">Car</span><span>${s.carProfile}</span></div>` : ''}
+            ${s.weather    ? `<div class="home-last-row"><span class="home-last-key">Weather</span><span>${s.weather}${s.airTemp ? ' · ' + s.airTemp + '°C' : ''}</span></div>` : ''}
+            <div class="home-last-row">
+              <span class="home-last-key">Handling</span>
+              <span>In: ${hEntry} · Mid: ${hMid} · Out: ${hExit}</span>
+            </div>
+            <div class="home-last-row">
+              <span class="home-last-key">Suspension</span>
+              <span>FC ${s.suspension?.frontComp||'—'} · FR ${s.suspension?.frontReb||'—'} · RC ${s.suspension?.rearComp||'—'} · RR ${s.suspension?.rearReb||'—'}</span>
+            </div>
+            ${s.notes ? `<div class="home-last-row"><span class="home-last-key">Notes</span><span style="max-width:60%;text-align:right;color:var(--muted);font-size:0.75rem;">${s.notes.slice(0,80)}${s.notes.length>80?'…':''}</span></div>` : ''}
+          </div>
+        </div>`;
+    }
+  }
+
+  const bestsEl = document.getElementById('home-bests');
+  if (bestsEl) {
+    const byTrack = {};
+    sessions.forEach((s, i) => {
+      if (!s.track || !s.laptime) return;
+      if (!byTrack[s.track] || s.laptime.localeCompare(byTrack[s.track].laptime) < 0) {
+        byTrack[s.track] = { ...s, _num: sessions.length - i };
+      }
+    });
+    const entries = Object.entries(byTrack);
+    if (entries.length === 0) {
+      bestsEl.innerHTML = '';
+    } else {
+      bestsEl.innerHTML = `
+        <div class="home-section-title">Personal Bests</div>
+        <div class="home-bests-card">
+          ${entries.map(([track, s]) => `
+            <div class="home-best-row" onclick="openModal(${s.id})">
+              <div>
+                <div class="home-best-track">🏁 ${track}</div>
+                <div class="home-best-sub">Session #${s._num} · ${s.date}</div>
+              </div>
+              <div class="home-best-lap">${s.laptime}</div>
+            </div>`).join('')}
+        </div>`;
+    }
+  }
+}
+
+function previewAccent(color) {
+  document.documentElement.style.setProperty('--accent', color);
+  document.getElementById('accent-color-picker').value = color;
+  document.querySelectorAll('.color-preset').forEach(p => {
+    p.classList.toggle('active', p.style.background === color || p.style.backgroundColor === color);
+  });
+}
+
+function setAccent(color) {
+  document.getElementById('accent-color-picker').value = color;
+  previewAccent(color);
+}
+
+function setTheme(theme) {
+  document.documentElement.classList.toggle('light', theme === 'light');
+  localStorage.setItem('pitlog_theme', theme);
+  // Update toggle buttons
+  document.getElementById('theme-btn-dark')?.classList.toggle('active', theme === 'dark');
+  document.getElementById('theme-btn-light')?.classList.toggle('active', theme === 'light');
+  haptic('light');
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem('pitlog_theme') || 'dark';
+  setTheme(saved);
+}
+
+function saveAccentColor() {
+  const color = document.getElementById('accent-color-picker').value;
+  localStorage.setItem('pitlog_accent', color);
+  previewAccent(color);
+  showToast('COLOR SAVED ✓');
+}
+
+function loadAccentColor() {
+  const saved = localStorage.getItem('pitlog_accent');
+  if (saved) previewAccent(saved);
+}
+
+// ── Coilover Click Settings ────────────────────────────────
+let clickSettings = JSON.parse(localStorage.getItem('pitlog_clicks') || '{"fComp":32,"fReb":32,"rComp":32,"rReb":32}');
+
+function saveClickSettings() {
+  const fComp = parseInt(document.getElementById('s-f-comp-max')?.value) || 32;
+  const fReb  = parseInt(document.getElementById('s-f-reb-max')?.value)  || 32;
+  const rComp = parseInt(document.getElementById('s-r-comp-max')?.value) || 32;
+  const rReb  = parseInt(document.getElementById('s-r-reb-max')?.value)  || 32;
+  clickSettings = { fComp, fReb, rComp, rReb };
+  localStorage.setItem('pitlog_clicks', JSON.stringify(clickSettings));
+  applyClickSettings();
+  showToast('CLICK SETTINGS SAVED ✓');
+}
+
+function applyClickSettings() {
+  const mid = (max) => Math.floor((1 + max) / 2);
+  const map = [
+    ['f-comp', 'f-comp-val', clickSettings.fComp],
+    ['f-reb',  'f-reb-val',  clickSettings.fReb],
+    ['r-comp', 'r-comp-val', clickSettings.rComp],
+    ['r-reb',  'r-reb-val',  clickSettings.rReb],
+  ];
+  map.forEach(([sliderId, valId, max]) => {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
+    slider.max = max;
+    const v = parseInt(slider.value) > max ? mid(max) : parseInt(slider.value);
+    slider.value = v;
+    document.getElementById(valId).textContent = v;
+  });
+}
+
+function updateSliderMax(sliderId, valId, newMax) {
+  const max = parseInt(newMax) || 32;
+  const slider = document.getElementById(sliderId);
+  if (!slider) return;
+  slider.max = max;
+  if (parseInt(slider.value) > max) {
+    slider.value = max;
+    document.getElementById(valId).textContent = max;
+  }
+}
+
+function loadClickSettingsForm() {
+  document.getElementById('s-f-comp-max').value = clickSettings.fComp;
+  document.getElementById('s-f-reb-max').value  = clickSettings.fReb;
+  document.getElementById('s-r-comp-max').value = clickSettings.rComp;
+  document.getElementById('s-r-reb-max').value  = clickSettings.rReb;
+}
+function saveProfile() {
+  const name = document.getElementById('p-name')?.value.trim();
+  if (!name) { alert('Please enter a profile name.'); return; }
+  const profile = {
+    id: editingProfileId || Date.now(),
+    name,
+    make: document.getElementById('p-make')?.value || '',
+    model: document.getElementById('p-model')?.value || '',
+    year: document.getElementById('p-year')?.value || '',
+    coilover: document.getElementById('p-coilover')?.value || '',
+    springF: document.getElementById('p-spring-f')?.value || '',
+    springR: document.getElementById('p-spring-r')?.value || '',
+    weight: document.getElementById('p-weight')?.value || '',
+    note: document.getElementById('p-note')?.value || '',
+  };
+  if (editingProfileId) {
+    const idx = carProfiles.findIndex(p => p.id === editingProfileId);
+    if (idx !== -1) carProfiles[idx] = profile;
+  } else {
+    carProfiles.push(profile);
+  }
+  localStorage.setItem('pitlog_profiles', JSON.stringify(carProfiles));
+  clearProfileForm();
+  renderProfileList();
+  populateCarProfileDropdown();
+  showToast(editingProfileId ? 'PROFILE UPDATED ✓' : 'PROFILE SAVED ✓');
+  editingProfileId = null;
+}
+
+function editProfile(id) {
+  const p = carProfiles.find(x => x.id === id);
+  if (!p) return;
+  editingProfileId = id;
+  document.getElementById('p-name').value = p.name;
+  document.getElementById('p-make').value = p.make;
+  document.getElementById('p-model').value = p.model;
+  document.getElementById('p-year').value = p.year;
+  document.getElementById('p-coilover').value = p.coilover;
+  document.getElementById('p-spring-f').value = p.springF;
+  document.getElementById('p-spring-r').value = p.springR;
+  document.getElementById('p-weight').value = p.weight;
+  document.getElementById('p-note').value = p.note;
+  document.getElementById('s-profile-form-title').textContent = 'EDIT PROFILE';
+  document.getElementById('p-cancel-btn').style.display = 'block';
+  setTimeout(() => document.getElementById('s-profile-form').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+function deleteProfile(id) {
+  if (!confirm('Delete this car profile?')) return;
+  carProfiles = carProfiles.filter(p => p.id !== id);
+  localStorage.setItem('pitlog_profiles', JSON.stringify(carProfiles));
+  if (editingProfileId === id) { clearProfileForm(); editingProfileId = null; }
+  renderProfileList();
+  populateCarProfileDropdown();
+}
+
+function cancelProfileEdit() {
+  editingProfileId = null;
+  clearProfileForm();
+}
+
+function clearProfileForm() {
+  ['p-name','p-make','p-model','p-year','p-coilover','p-spring-f','p-spring-r','p-weight','p-note']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('s-profile-form-title').textContent = 'NEW PROFILE';
+  document.getElementById('p-cancel-btn').style.display = 'none';
+}
+
+function toggleProfileCard(id) {
+  const card = document.getElementById(`pcard-${id}`);
+  if (!card) return;
+  const isExpanded = card.classList.contains('expanded');
+  // Collapse all others
+  document.querySelectorAll('.profile-card.expanded').forEach(c => c.classList.remove('expanded'));
+  if (!isExpanded) card.classList.add('expanded');
+}
+
+function deleteProfile(id) {
+  const btn = document.getElementById(`pdel-${id}`);
+  if (!btn) return;
+  if (btn.dataset.confirm !== 'yes') {
+    btn.textContent = 'TAP AGAIN TO DELETE';
+    btn.dataset.confirm = 'yes';
+    setTimeout(() => { if (btn) { btn.textContent = 'DELETE'; btn.dataset.confirm = ''; } }, 3000);
+    return;
+  }
+  carProfiles = carProfiles.filter(p => p.id !== id);
+  localStorage.setItem('pitlog_profiles', JSON.stringify(carProfiles));
+  if (editingProfileId === id) { clearProfileForm(); editingProfileId = null; }
+  renderProfileList();
+  populateCarProfileDropdown();
+}
+
+function renderProfileList() {
+  const container = document.getElementById('s-profile-list');
+  if (!container) return;
+  if (carProfiles.length === 0) {
+    container.innerHTML = '<div class="track-empty">No car profiles yet — create one below</div>';
+    return;
+  }
+  const dr = (label, val) => val ? `<div class="profile-detail-row"><span class="profile-dk">${label}</span><span class="profile-dv">${val}</span></div>` : '';
+  container.innerHTML = carProfiles.map(p => `
+    <div class="profile-card" id="pcard-${p.id}" onclick="toggleProfileCard(${p.id})">
+      <div class="profile-card-header">
+        <div>
+          <div class="profile-card-name">🚗 ${p.name}</div>
+          <div class="profile-card-sub">${[p.year, p.make, p.model].filter(Boolean).join(' ') || 'No details added'}</div>
+        </div>
+        <div class="profile-card-chevron">›</div>
+      </div>
+      <div class="profile-card-details">
+        ${dr('Make', p.make)}
+        ${dr('Model', p.model)}
+        ${dr('Year', p.year)}
+        ${dr('Coilover', p.coilover)}
+        ${dr('Spring Rate Front', p.springF)}
+        ${dr('Spring Rate Rear', p.springR)}
+        ${dr('Weight', p.weight ? p.weight + ' lbs' : '')}
+        ${p.note ? `<div class="profile-note-text">${p.note}</div>` : ''}
+        <div class="profile-card-actions" onclick="event.stopPropagation()">
+          <button class="profile-edit-btn" onclick="editProfile(${p.id})">✏ EDIT</button>
+          <button class="profile-del-btn" id="pdel-${p.id}" onclick="deleteProfile(${p.id})">DELETE</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function populateCarProfileDropdown() {
+  const sel = document.getElementById('car-profile');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select a car profile —</option>' +
+    carProfiles.map(p => `<option value="${p.name}"${p.name === current ? ' selected' : ''}>${p.name}</option>`).join('');
+}
+
+let tiresFront = JSON.parse(localStorage.getItem('pitlog_tires_front') || '[]');
+let tiresRear = JSON.parse(localStorage.getItem('pitlog_tires_rear') || '[]');
+
+function addTireFront() {
+  const input = document.getElementById('s-tire-front-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (tiresFront.includes(val)) { showToast('ALREADY EXISTS'); return; }
+  tiresFront.push(val);
+  tiresFront.sort();
+  localStorage.setItem('pitlog_tires_front', JSON.stringify(tiresFront));
+  input.value = '';
+  renderTireFrontList();
+  populateTireFrontDropdown();
+}
+
+function deleteTireFront(val) {
+  tiresFront = tiresFront.filter(t => t !== val);
+  localStorage.setItem('pitlog_tires_front', JSON.stringify(tiresFront));
+  renderTireFrontList();
+  populateTireFrontDropdown();
+}
+
+function renderTireFrontList() {
+  const container = document.getElementById('s-tire-front-list');
+  if (!container) return;
+  if (tiresFront.length === 0) { container.innerHTML = '<div class="track-empty">No front tire sizes added yet</div>'; return; }
+  container.innerHTML = tiresFront.map(t => `
+    <div class="track-item">
+      <span class="t-name">🔵 ${t}</span>
+      <button class="track-del" onclick="deleteTireFront('${t.replace(/'/g, "\\'")}')">✕</button>
+    </div>`).join('');
+}
+
+function populateTireFrontDropdown() {
+  const sel = document.getElementById('tire-front');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select —</option>' +
+    tiresFront.map(t => `<option value="${t}"${t === current ? ' selected' : ''}>${t}</option>`).join('');
+}
+
+function addTireRear() {
+  const input = document.getElementById('s-tire-rear-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (tiresRear.includes(val)) { showToast('ALREADY EXISTS'); return; }
+  tiresRear.push(val);
+  tiresRear.sort();
+  localStorage.setItem('pitlog_tires_rear', JSON.stringify(tiresRear));
+  input.value = '';
+  renderTireRearList();
+  populateTireRearDropdown();
+}
+
+function deleteTireRear(val) {
+  tiresRear = tiresRear.filter(t => t !== val);
+  localStorage.setItem('pitlog_tires_rear', JSON.stringify(tiresRear));
+  renderTireRearList();
+  populateTireRearDropdown();
+}
+
+function renderTireRearList() {
+  const container = document.getElementById('s-tire-rear-list');
+  if (!container) return;
+  if (tiresRear.length === 0) { container.innerHTML = '<div class="track-empty">No rear tire sizes added yet</div>'; return; }
+  container.innerHTML = tiresRear.map(t => `
+    <div class="track-item">
+      <span class="t-name">🔴 ${t}</span>
+      <button class="track-del" onclick="deleteTireRear('${t.replace(/'/g, "\\'")}')">✕</button>
+    </div>`).join('');
+}
+
+function populateTireRearDropdown() {
+  const sel = document.getElementById('tire-rear');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select —</option>' +
+    tiresRear.map(t => `<option value="${t}"${t === current ? ' selected' : ''}>${t}</option>`).join('');
+}
+
+let tireModels = JSON.parse(localStorage.getItem('pitlog_tire_models') || '[]');
+
+function addTireModel() {
+  const input = document.getElementById('s-tire-model-input');
+  const val = input.value.trim();
+  if (!val) return;
+  if (tireModels.includes(val)) { showToast('ALREADY EXISTS'); return; }
+  tireModels.push(val);
+  tireModels.sort();
+  localStorage.setItem('pitlog_tire_models', JSON.stringify(tireModels));
+  input.value = '';
+  renderTireModelList();
+  populateTireModelDropdown();
+}
+
+function deleteTireModel(val) {
+  tireModels = tireModels.filter(t => t !== val);
+  localStorage.setItem('pitlog_tire_models', JSON.stringify(tireModels));
+  renderTireModelList();
+  populateTireModelDropdown();
+}
+
+function renderTireModelList() {
+  const container = document.getElementById('s-tire-model-list');
+  if (!container) return;
+  if (tireModels.length === 0) { container.innerHTML = '<div class="track-empty">No tire models added yet</div>'; return; }
+  container.innerHTML = tireModels.map(t => `
+    <div class="track-item">
+      <span class="t-name">🏎 ${t}</span>
+      <button class="track-del" onclick="deleteTireModel('${t.replace(/'/g, "\\'")}')">✕</button>
+    </div>`).join('');
+}
+
+function populateTireModelDropdown() {
+  const sel = document.getElementById('tire-model');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select —</option>' +
+    tireModels.map(t => `<option value="${t}"${t === current ? ' selected' : ''}>${t}</option>`).join('');
+}
+
+function loadSetupForm() {
+  renderTrackList();
+  renderTireFrontList();
+  renderTireRearList();
+  renderTireModelList();
+  renderProfileList();
+  loadClickSettingsForm();
+  const saved = localStorage.getItem('pitlog_accent');
+  if (saved) { document.getElementById('accent-color-picker').value = saved; previewAccent(saved); }
+  loadApiKeyForm();
+  renderSetupEventList();
+}
+
+function populateTrackDropdownOLD() {}
+
+// allow pressing Enter to add track
+document.addEventListener('DOMContentLoaded', () => {
+  const ti = document.getElementById('s-track-input');
+  if (ti) ti.addEventListener('keydown', e => { if (e.key === 'Enter') addTrack(); });
+});
+
+function selectWeather(el, val) {
+  document.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedWeather = val;
+}
+
+function updateSlider(id, valId) {
+  document.getElementById(valId).textContent = document.getElementById(id).value;
+}
+
+function g(id) { return document.getElementById(id)?.value || ''; }
+
+function saveSession() {
+  const track = g('track');
+  if (!track) { alert('Please select a track.'); return; }
+
+  const session = {
+    id: Date.now(),
+    event: g('event'),
+    track,
+    date: g('date') || new Date().toISOString().slice(0,10),
+    laptime: g('laptime'),
+    carProfile: g('car-profile'),
+    tireFront: g('tire-front'),
+    tireRear: g('tire-rear'),
+    tireModel: g('tire-model'),
+    airTemp: g('air-temp'),
+    trackTemp: g('track-temp'),
+    trackState: g('track-state'),
+    tires: {
+      compound: g('tire-compound'),
+      fl: { cold: g('tfl-cold'), hot: g('tfl-hot'), temps: g('tfl-temps') },
+      fr: { cold: g('tfr-cold'), hot: g('tfr-hot'), temps: g('tfr-temps') },
+      rl: { cold: g('trl-cold'), hot: g('trl-hot'), temps: g('trl-temps') },
+      rr: { cold: g('trr-cold'), hot: g('trr-hot'), temps: g('trr-temps') },
+    },
+    suspension: {
+      frontComp: g('f-comp'),
+      frontReb: g('f-reb'),
+      frontSpring: g('f-spring'),
+      frontRH: g('f-rh'),
+      rearComp: g('r-comp'),
+      rearReb: g('r-reb'),
+      rearSpring: g('r-spring'),
+      rearRH: g('r-rh'),
+    },
+    notes: g('notes'),
+    changes: g('changes'),
+    handling: {
+      entry: g('handling-entry'),
+      mid: g('handling-mid'),
+      exit: g('handling-exit'),
+    },
+  };
+
+  sessions.unshift(session);
+  localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  haptic('success');
+  showToast('SESSION SAVED ✓');
+  resetForm();
+  populateEventSelect();
+}
+
+function resetForm() {
+  ['laptime','track-temp','tire-compound',
+   'tfl-cold','tfl-hot','tfl-temps','tfr-cold','tfr-hot','tfr-temps',
+   'trl-cold','trl-hot','trl-temps','trr-cold','trr-hot','trr-temps',
+   'f-spring','f-rh','r-spring','r-rh','notes','changes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // Prefill from last session if available
+  const last = sessions[0];
+  if (last) {
+    document.getElementById('track').value = last.track || '';
+    document.getElementById('event').value = last.event || '';
+    document.getElementById('car-profile').value = last.carProfile || '';
+    document.getElementById('tire-front').value = last.tireFront || '';
+    document.getElementById('tire-rear').value = last.tireRear || '';
+    document.getElementById('tire-model').value = last.tireModel || '';
+    document.getElementById('track-state').value = last.trackState || 'Green / Rubbered In';
+    const airTemp = last.airTemp !== undefined && last.airTemp !== '' ? last.airTemp : 20;
+    document.getElementById('air-temp').value = airTemp;
+    document.getElementById('air-temp-val').textContent = airTemp;
+    if (last.weather) {
+      selectedWeather = last.weather;
+      document.querySelectorAll('.weather-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent.includes(last.weather));
+      });
+    } else {
+      selectedWeather = '';
+      document.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('selected'));
+    }
+  } else {
+    document.getElementById('track').value = '';
+    document.getElementById('car-profile').value = '';
+    document.getElementById('tire-front').value = '';
+    document.getElementById('tire-rear').value = '';
+    document.getElementById('tire-model').value = '';
+    document.getElementById('air-temp').value = 20;
+    document.getElementById('air-temp-val').textContent = 20;
+    selectedWeather = '';
+    document.querySelectorAll('.weather-btn').forEach(b => b.classList.remove('selected'));
+  }
+
+  document.getElementById('handling-entry').value = '';
+  document.getElementById('handling-mid').value = '';
+  document.getElementById('handling-exit').value = '';
+
+  const mid = (max) => Math.floor((1 + max) / 2);
+  const setSlider = (id, valId, max) => {
+    const v = mid(max);
+    document.getElementById(id).value = v;
+    document.getElementById(valId).textContent = v;
+  };
+  setSlider('f-comp', 'f-comp-val', clickSettings.fComp);
+  setSlider('f-reb',  'f-reb-val',  clickSettings.fReb);
+  setSlider('r-comp', 'r-comp-val', clickSettings.rComp);
+  setSlider('r-reb',  'r-reb-val',  clickSettings.rReb);
+  updateDials();
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  if (sessions.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="big">🏁</div><p>No sessions logged yet.<br>Log your first session to see it here.</p></div>`;
+    return;
+  }
+
+  // Build ordered list of groups preserving session order
+  const groups = []; // [{name, sessions:[]}]
+  const groupMap = {};
+  sessions.forEach((s, i) => {
+    const key = s.event?.trim() || '__ungrouped__';
+    if (!groupMap[key]) {
+      groupMap[key] = { name: key, sessions: [] };
+      groups.push(groupMap[key]);
+    }
+    groupMap[key].sessions.push({ s, globalIdx: i });
+  });
+
+  const collapsed = JSON.parse(localStorage.getItem('pitlog_collapsed_events') || '{}');
+
+  container.innerHTML = groups.map(group => {
+    const isUngrouped = group.name === '__ungrouped__';
+    const groupKey = group.name;
+    const isCollapsed = collapsed[groupKey] === true;
+    const sessionCount = group.sessions.length;
+    const laps = group.sessions.filter(({s}) => s.laptime);
+    const bestLap = laps.length ? laps.reduce((best, {s}) =>
+      !best || s.laptime.localeCompare(best) < 0 ? s.laptime : best, null) : null;
+
+    const headerHtml = isUngrouped ? `
+      <div class="event-header ungrouped" onclick="toggleEventGroup('${groupKey.replace(/'/g,"\\'")}')">
+        <div class="event-header-left">
+          <span class="event-collapse-icon">${isCollapsed ? '▶' : '▼'}</span>
+          <span class="event-name-text" style="color:var(--muted);font-style:italic;">Ungrouped</span>
+        </div>
+        <div class="event-header-right">
+          <span class="event-badge">${sessionCount} run${sessionCount !== 1 ? 's' : ''}</span>
+        </div>
+      </div>` : `
+      <div class="event-header" onclick="toggleEventGroup('${groupKey.replace(/'/g,"\\'")}')">
+        <div class="event-header-left">
+          <span class="event-collapse-icon">${isCollapsed ? '▶' : '▼'}</span>
+          <div>
+            <div class="event-name-text">${group.name}</div>
+            ${group.sessions[0]?.s?.date ? `<div class="event-date-range">${getEventDateRange(group.sessions.map(({s})=>s))}</div>` : ''}
+          </div>
+        </div>
+        <div class="event-header-right">
+          <span class="event-badge">${sessionCount} run${sessionCount !== 1 ? 's' : ''}</span>
+          ${bestLap ? `<span class="event-best">🏆 ${bestLap}</span>` : ''}
+        </div>
+      </div>`;
+
+    const cardsHtml = group.sessions.map(({ s, globalIdx }) => {
+      const num = sessions.length - globalIdx;
+      return `
+      <div class="swipe-wrap" id="swipe-wrap-${s.id}">
+        <div class="swipe-delete-bg">
+          <span class="swipe-delete-label">DELETE</span>
+          <span class="swipe-delete-icon">🗑</span>
+        </div>
+        <div class="swipe-card session-card" id="swipe-card-${s.id}" data-id="${s.id}"
+          onclick="openModal(${s.id})">
+          <div class="s-header">
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div class="s-num">#${num}</div>
+              <div class="s-track">${s.track}</div>
+            </div>
+            <div class="s-date">${s.date}</div>
+          </div>
+          <div class="s-meta">
+            ${s.carProfile ? `<div class="s-tag">🚗 <span>${s.carProfile}</span></div>` : ''}
+            ${s.laptime ? `<div class="s-tag">⏱ <span>${s.laptime}</span></div>` : ''}
+            ${s.weather ? `<div class="s-tag">${s.weather}</div>` : ''}
+            ${s.airTemp ? `<div class="s-tag">🌡 <span>${s.airTemp}°C</span></div>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="event-group" data-event="${groupKey.replace(/"/g,'&quot;')}">
+        ${headerHtml}
+        <div class="event-sessions ${isCollapsed ? 'collapsed' : ''}">${cardsHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+function getEventDateRange(sessionList) {
+  const dates = sessionList.map(s => s.date).filter(Boolean).sort();
+  if (!dates.length) return '';
+  if (dates[0] === dates[dates.length - 1]) return dates[0];
+  return `${dates[0]} — ${dates[dates.length - 1]}`;
+}
+
+function toggleEventGroup(key) {
+  const collapsed = JSON.parse(localStorage.getItem('pitlog_collapsed_events') || '{}');
+  collapsed[key] = !collapsed[key];
+  localStorage.setItem('pitlog_collapsed_events', JSON.stringify(collapsed));
+  renderHistory();
+  initSwipe();
+}
+
+function openModal(id) {
+  const s = sessions.find(x => x.id == id);
+  if (!s) return;
+  currentModalId = Number(id);
+  const num = sessions.length - sessions.findIndex(x => x.id == id);
+  document.getElementById('modal-title').textContent = `#${num} — ${s.track}`;
+
+  const row = (label, val) => val ? `<div class="detail-row"><div class="dk">${label}</div><div class="dv">${val}</div></div>` : '';
+  const sec = (label) => `<div class="detail-section">${label}</div>`;
+
+  document.getElementById('modal-body').innerHTML = `
+    ${s.event ? row('Event', s.event) : ''}
+    ${row('Date', s.date)}
+    ${row('Best Lap', s.laptime)}
+    ${row('Car Profile', s.carProfile)}
+    ${sec('Tires')}
+    ${row('Front Tire', s.tireFront)}
+    ${row('Rear Tire', s.tireRear)}
+    ${row('Tire Model', s.tireModel)}
+    ${sec('Weather & Track')}
+    ${row('Conditions', s.weather)}
+    ${row('Air Temp', s.airTemp ? s.airTemp + '°C' : '')}
+    ${row('Track State', s.trackState)}
+    ${sec('Suspension')}
+    ${row('Front Compression', s.suspension?.frontComp ? s.suspension.frontComp + ' clicks' : '')}
+    ${row('Front Rebound', s.suspension?.frontReb ? s.suspension.frontReb + ' clicks' : '')}
+    ${row('Rear Compression', s.suspension?.rearComp ? s.suspension.rearComp + ' clicks' : '')}
+    ${row('Rear Rebound', s.suspension?.rearReb ? s.suspension.rearReb + ' clicks' : '')}
+    ${s.notes ? sec('Driver Notes') + row('Feedback', s.notes) : ''}
+    ${s.handling?.entry || s.handling?.mid || s.handling?.exit ? sec('Car Handling') + row('Entry', s.handling.entry) + row('Mid', s.handling.mid) + row('Exit', s.handling.exit) : ''}
+    ${s.changes ? row('Changes for Next', s.changes) : ''}
+  `;
+
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal(e) {
+  closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+function deleteCurrentSession() {
+  const btn = document.querySelector('.btn-danger');
+  if (btn.dataset.confirm !== 'yes') {
+    btn.textContent = 'TAP AGAIN TO CONFIRM';
+    btn.dataset.confirm = 'yes';
+    setTimeout(() => { btn.textContent = 'DELETE SESSION'; btn.dataset.confirm = ''; }, 3000);
+    return;
+  }
+  sessions = sessions.filter(s => s.id != currentModalId);
+  localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  closeModalDirect();
+  renderHistory();
+  showToast('SESSION DELETED');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Compare Page ──────────────────────────────────────────
+const COLS = [
+  { key: 'num',        label: '#',            get: (s, i, arr) => String(arr.length - i) },
+  { key: 'track',      label: 'Track',        get: s => s.track || '' },
+  { key: 'date',       label: 'Date',         get: s => s.date || '' },
+  { key: 'laptime',    label: 'Best Lap',     get: s => s.laptime || '', cls: 'lap' },
+  { key: 'carProfile', label: 'Car Profile',  get: s => s.carProfile || '' },
+  { key: 'tireFront',  label: 'Front Tire',   get: s => s.tireFront || '' },
+  { key: 'tireRear',   label: 'Rear Tire',    get: s => s.tireRear || '' },
+  { key: 'tireModel',  label: 'Tire Model',   get: s => s.tireModel || '' },
+  { key: 'fComp',      label: 'F. Comp',      get: s => s.suspension?.frontComp || '' },
+  { key: 'fReb',       label: 'F. Reb',       get: s => s.suspension?.frontReb || '' },
+  { key: 'rComp',      label: 'R. Comp',      get: s => s.suspension?.rearComp || '' },
+  { key: 'rReb',       label: 'R. Reb',       get: s => s.suspension?.rearReb || '' },
+];
+
+let compareFilters = {};
+let compareSortKey = 'date';
+let compareSortDir = -1; // -1 = desc, 1 = asc
+
+function renderCompare() {
+  if (sessions.length === 0) {
+    const filters = document.getElementById('compare-filters');
+    const wrap = document.querySelector('#stats-compare .compare-wrap');
+    if (filters) filters.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:0.85rem;text-align:center;">No sessions logged yet</div>';
+    if (wrap) wrap.style.display = 'none';
+    return;
+  }
+  const wrap = document.querySelector('#stats-compare .compare-wrap');
+  if (wrap) wrap.style.display = '';
+  renderCompareFilters();
+  renderCompareTable();
+}
+
+const FILTER_KEYS = ['track', 'carProfile', 'tireFront', 'tireRear', 'tireModel'];
+
+function renderCompareFilters() {
+  const container = document.getElementById('compare-filters');
+  if (!container) return;
+  container.innerHTML = COLS.filter(col => FILTER_KEYS.includes(col.key)).map(col => {
+    const vals = [...new Set(sessions.map((s, i) => col.get(s, i, sessions)).filter(Boolean))].sort();
+    const options = vals.map(v => `<option value="${v}"${compareFilters[col.key]===v?' selected':''}>${v}</option>`).join('');
+    return `<div class="filter-group">
+      <label>${col.label}</label>
+      <select onchange="setFilter('${col.key}',this.value)">
+        <option value="">All</option>${options}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(key, val) {
+  if (val) compareFilters[key] = val;
+  else delete compareFilters[key];
+  renderCompareTable();
+}
+
+function getFilteredSorted() {
+  let data = sessions
+    .map((s, i) => ({ s, num: sessions.length - i }))
+    .filter(({ s }) =>
+      Object.entries(compareFilters).every(([key, val]) => {
+        const col = COLS.find(c => c.key === key);
+        return col && col.get(s, sessions.indexOf(s), sessions) === val;
+      })
+    );
+  data.sort((a, b) => {
+    const col = COLS.find(c => c.key === compareSortKey);
+    if (!col) return 0;
+    const av = col.get(a.s, sessions.indexOf(a.s), sessions);
+    const bv = col.get(b.s, sessions.indexOf(b.s), sessions);
+    return av < bv ? -compareSortDir : av > bv ? compareSortDir : 0;
+  });
+  return data;
+}
+
+function setSort(key) {
+  if (compareSortKey === key) compareSortDir *= -1;
+  else { compareSortKey = key; compareSortDir = 1; }
+  renderCompareTable();
+}
+
+function renderCompareTable() {
+  const data = getFilteredSorted();
+
+  // Header
+  document.getElementById('compare-thead').innerHTML = `<tr>${
+    COLS.map(col => {
+      const sorted = compareSortKey === col.key;
+      const icon = sorted ? (compareSortDir === 1 ? '▲' : '▼') : '▲';
+      return `<th onclick="setSort('${col.key}')" class="${sorted?'sorted':''}">
+        ${col.label}<span class="sort-icon">${icon}</span>
+      </th>`;
+    }).join('')
+  }</tr>`;
+
+  // Body
+  if (data.length === 0) {
+    document.getElementById('compare-tbody').innerHTML =
+      `<tr><td colspan="${COLS.length}" style="text-align:center;padding:24px;color:var(--muted);">No sessions match the filters</td></tr>`;
+    return;
+  }
+
+  document.getElementById('compare-tbody').innerHTML = data.map(({ s }) => {
+    const idx = sessions.indexOf(s);
+    return `<tr>${COLS.map(col => {
+      const val = col.get(s, idx, sessions);
+      return `<td class="${col.cls||''} ${val?'':'no-data'}">${val || '—'}</td>`;
+    }).join('')}</tr>`;
+  }).join('');
+}
+
+// ── Calendar ──────────────────────────────────────────────
+let calDate = new Date();
+let calSelected = new Date();
+
+function toggleCal() {
+  const dd = document.getElementById('cal-dropdown');
+  const trigger = document.getElementById('cal-trigger');
+  const isOpen = dd.classList.contains('open');
+  if (isOpen) { dd.classList.remove('open'); trigger.classList.remove('open'); }
+  else { dd.classList.add('open'); trigger.classList.add('open'); renderCal(); }
+}
+
+function calShift(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCal();
+}
+
+function renderCal() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = months[calDate.getMonth()] + ' ' + calDate.getFullYear();
+
+  const today = new Date();
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+    const isSel = d === calSelected.getDate() && month === calSelected.getMonth() && year === calSelected.getFullYear();
+    const cls = [isToday ? 'today' : '', isSel ? 'selected' : ''].filter(Boolean).join(' ');
+    html += `<div class="cal-day ${cls}" onclick="selectDay(${d})">${d}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML = html;
+}
+
+function selectDay(d) {
+  calSelected = new Date(calDate.getFullYear(), calDate.getMonth(), d);
+  const iso = calSelected.toISOString().slice(0, 10);
+  document.getElementById('date').value = iso;
+  const [y, m, day] = iso.split('-');
+  document.getElementById('cal-display').textContent = `${parseInt(day)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]} ${y}`;
+  document.getElementById('cal-dropdown').classList.remove('open');
+  document.getElementById('cal-trigger').classList.remove('open');
+}
+
+// Close calendar when clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('cal-dropdown');
+  const trigger = document.getElementById('cal-trigger');
+  if (dropdown && !dropdown.contains(e.target) && !trigger.contains(e.target)) {
+    dropdown.classList.remove('open');
+    trigger.classList.remove('open');
+  }
+});
+
+// ── Haptic Feedback ──────────────────────────────────────
+function haptic(style = 'light') {
+  if (navigator.vibrate) {
+    const patterns = { light: [10], medium: [20], success: [10, 50, 10] };
+    navigator.vibrate(patterns[style] || [10]);
+  }
+}
+
+// ── Tab switching ─────────────────────────────────────────
+function switchStatsTab(tab, btn) {
+  document.querySelectorAll('#page-stats .stats-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.stats-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('stats-' + tab).classList.add('active');
+  if (tab === 'chart') renderChart();
+  if (tab === 'compare') renderCompare();
+  if (tab === 'delta') populateDeltaSelects();
+  if (tab === 'bests') renderBests();
+}
+
+function switchAiTab(tab, btn) {
+  document.querySelectorAll('#page-ai .stats-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ai-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ai-' + tab).classList.add('active');
+}
+
+// ── Stats Page ────────────────────────────────────────────
+function renderStats() {
+  renderBests();
+  populateChartTrackSelect();
+  populateBvlTrackSelect();
+  populateDeltaSelects();
+}
+
+// Personal Bests per track
+function renderBests() {
+  const container = document.getElementById('bests-content');
+  if (!container) return;
+  if (sessions.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;">No sessions logged yet</div>';
+    return;
+  }
+  const byTrack = {};
+  sessions.forEach((s, i) => {
+    if (!s.track) return;
+    if (!byTrack[s.track]) byTrack[s.track] = [];
+    byTrack[s.track].push({ ...s, _num: sessions.length - i });
+  });
+
+  container.innerHTML = Object.entries(byTrack).map(([track, ss]) => {
+    const withLap = ss.filter(s => s.laptime).sort((a, b) => a.laptime.localeCompare(b.laptime));
+    const best = withLap[0];
+    const totalSessions = ss.length;
+    const lastDate = ss[0].date;
+    return `
+      <div class="bests-track-section">
+        <div class="bests-track-name">🏁 ${track}</div>
+        ${best ? `
+          <div class="bests-row" onclick="openModal(${best.id})" style="cursor:pointer;">
+            <span class="bests-label">Best Lap 🔍</span>
+            <div style="text-align:right;">
+              <div class="bests-val gold">${best.laptime}</div>
+              <div class="bests-sub">Session #${best._num} · ${best.date} — tap to view</div>
+            </div>
+          </div>` : ''}
+        <div class="bests-row">
+          <span class="bests-label">Sessions at this track</span>
+          <span class="bests-val">${totalSessions}</span>
+        </div>
+        <div class="bests-row">
+          <span class="bests-label">Last visited</span>
+          <span class="bests-val">${lastDate}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// Lap Time Chart
+function populateChartTrackSelect() {
+  const sel = document.getElementById('chart-track-sel');
+  if (!sel) return;
+  const tracks = [...new Set(sessions.map(s => s.track).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">— Select Track —</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderChart() {
+  const track = document.getElementById('chart-track-sel')?.value;
+  const canvas = document.getElementById('lap-chart');
+  const empty = document.getElementById('chart-empty');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const filtered = sessions.filter(s => s.track === track && s.laptime).reverse();
+
+  if (!track || filtered.length === 0) {
+    canvas.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  if (empty) empty.style.display = 'none';
+
+  // Convert lap times (m:ss.ms or ss.ms) to seconds for comparison
+  const toSec = t => {
+    if (!t) return null;
+    const parts = t.split(':');
+    if (parts.length === 2) return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
+    return parseFloat(t);
+  };
+
+  const data = filtered.map(s => toSec(s.laptime));
+  const labels = filtered.map((s, i) => `#${sessions.length - sessions.indexOf(s)}`);
+  const minVal = Math.min(...data.filter(Boolean));
+  const maxVal = Math.max(...data.filter(Boolean));
+  const pad = (maxVal - minVal) * 0.15 || 1;
+
+  const W = canvas.offsetWidth || 320;
+  const H = 220;
+  canvas.width = W;
+  canvas.height = H;
+
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e8ff00';
+  const muted = '#444';
+  const text = '#f0f0f0';
+
+  ctx.clearRect(0, 0, W, H);
+
+  const left = 44, right = 16, top = 16, bottom = 36;
+  const chartW = W - left - right;
+  const chartH = H - top - bottom;
+  const n = data.length;
+
+  // Grid lines
+  const steps = 4;
+  for (let i = 0; i <= steps; i++) {
+    const y = top + (chartH / steps) * i;
+    const val = maxVal + pad - ((maxVal - minVal + 2 * pad) / steps) * i;
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(left + chartW, y);
+    ctx.stroke();
+    ctx.fillStyle = muted;
+    ctx.font = '10px Barlow';
+    ctx.textAlign = 'right';
+    const mm = Math.floor(val / 60);
+    const ss = (val % 60).toFixed(2).padStart(5, '0');
+    ctx.fillText(mm > 0 ? `${mm}:${ss}` : `${ss}s`, left - 4, y + 4);
+  }
+
+  // Line
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  data.forEach((v, i) => {
+    const x = left + (n === 1 ? chartW / 2 : (chartW / (n - 1)) * i);
+    const y = top + chartH - ((v - (minVal - pad)) / (maxVal - minVal + 2 * pad)) * chartH;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots + labels
+  data.forEach((v, i) => {
+    const x = left + (n === 1 ? chartW / 2 : (chartW / (n - 1)) * i);
+    const y = top + chartH - ((v - (minVal - pad)) / (maxVal - minVal + 2 * pad)) * chartH;
+    ctx.fillStyle = v === minVal ? accent : '#333';
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = muted;
+    ctx.font = '9px Barlow';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[i], x, H - 8);
+  });
+}
+
+// Best vs Latest
+function populateBvlTrackSelect() {
+  const sel = document.getElementById('bvl-track-sel');
+  if (!sel) return;
+  const tracks = [...new Set(sessions.map(s => s.track).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">— Select Track —</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderBestVsLatest() {
+  const track = document.getElementById('bvl-track-sel')?.value;
+  const container = document.getElementById('bvl-content');
+  if (!container) return;
+  const ss = sessions.filter(s => s.track === track && s.laptime);
+  if (!track || ss.length < 2) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Need at least 2 sessions with lap times at this track</div>';
+    return;
+  }
+  const latest = ss[0];
+  const best = [...ss].sort((a, b) => a.laptime.localeCompare(b.laptime))[0];
+  const latestNum = sessions.length - sessions.indexOf(latest);
+  const bestNum = sessions.length - sessions.indexOf(best);
+
+  const row = (label, bVal, lVal) => `
+    <div class="bvl-cell key">${label}</div>
+    <div class="bvl-cell val ${bVal === lVal ? '' : 'accent'}">${bVal || '—'}</div>
+    <div class="bvl-cell val">${lVal || '—'}</div>`;
+
+  container.innerHTML = `
+    <div class="bvl-grid">
+      <div class="bvl-hdr"></div>
+      <div class="bvl-hdr">Best (#${bestNum})</div>
+      <div class="bvl-hdr">Latest (#${latestNum})</div>
+      ${row('Lap Time', best.laptime, latest.laptime)}
+      ${row('Date', best.date, latest.date)}
+      ${row('F. Comp', best.suspension?.frontComp, latest.suspension?.frontComp)}
+      ${row('F. Reb', best.suspension?.frontReb, latest.suspension?.frontReb)}
+      ${row('R. Comp', best.suspension?.rearComp, latest.suspension?.rearComp)}
+      ${row('R. Reb', best.suspension?.rearReb, latest.suspension?.rearReb)}
+      ${row('Tire Model', best.tireModel, latest.tireModel)}
+      ${row('Weather', best.weather, latest.weather)}
+      ${row('Air Temp', best.airTemp ? best.airTemp + '°C' : '', latest.airTemp ? latest.airTemp + '°C' : '')}
+    </div>`;
+}
+
+// Setup Delta
+function populateDeltaSelects() {
+  const makeOpts = () => sessions.map((s, i) => {
+    const num = sessions.length - i;
+    return `<option value="${s.id}">#${num} — ${s.track} (${s.date})</option>`;
+  }).join('');
+  const a = document.getElementById('delta-a');
+  const b = document.getElementById('delta-b');
+  if (!a || !b) return;
+  const opts = '<option value="">— Select —</option>' + makeOpts();
+  a.innerHTML = opts;
+  b.innerHTML = opts;
+}
+
+function renderDelta() {
+  const idA = document.getElementById('delta-a')?.value;
+  const idB = document.getElementById('delta-b')?.value;
+  const container = document.getElementById('delta-content');
+  if (!container) return;
+  if (!idA || !idB || idA === idB) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Select two different sessions to compare</div>';
+    return;
+  }
+  const sA = sessions.find(s => s.id == idA);
+  const sB = sessions.find(s => s.id == idB);
+  if (!sA || !sB) return;
+
+  const numA = sessions.length - sessions.indexOf(sA);
+  const numB = sessions.length - sessions.indexOf(sB);
+
+  const diffNum = (a, b) => {
+    const na = parseFloat(a), nb = parseFloat(b);
+    if (isNaN(na) || isNaN(nb) || na === nb) return '<span class="delta-diff same">—</span>';
+    const d = nb - na;
+    const cls = d > 0 ? 'worse' : 'better';
+    return `<span class="delta-diff ${cls}">${d > 0 ? '+' : ''}${d}</span>`;
+  };
+
+  const row = (label, aVal, bVal, numericDiff = false) => `
+    <div class="delta-row">
+      <span class="delta-label">${label}</span>
+      <span class="delta-a-val">${aVal || '—'}</span>
+      <span class="delta-b-val">${bVal || '—'}</span>
+      ${numericDiff ? diffNum(aVal, bVal) : `<span class="delta-diff same">${aVal === bVal ? '=' : '≠'}</span>`}
+    </div>`;
+
+  container.innerHTML = `
+    <div class="delta-col-hdr">
+      <span>Field</span>
+      <span>#${numA}</span>
+      <span>#${numB}</span>
+      <span>Δ</span>
+    </div>
+    <div class="delta-section-hdr">Session</div>
+    ${row('Track', sA.track, sB.track)}
+    ${row('Date', sA.date, sB.date)}
+    ${row('Lap Time', sA.laptime, sB.laptime)}
+    ${row('Weather', sA.weather, sB.weather)}
+    ${row('Air Temp', sA.airTemp ? sA.airTemp + '°C' : '', sB.airTemp ? sB.airTemp + '°C' : '', true)}
+    <div class="delta-section-hdr">Suspension</div>
+    ${row('F. Comp', sA.suspension?.frontComp, sB.suspension?.frontComp, true)}
+    ${row('F. Reb', sA.suspension?.frontReb, sB.suspension?.frontReb, true)}
+    ${row('R. Comp', sA.suspension?.rearComp, sB.suspension?.rearComp, true)}
+    ${row('R. Reb', sA.suspension?.rearReb, sB.suspension?.rearReb, true)}
+    <div class="delta-section-hdr">Tires</div>
+    ${row('Front Tire', sA.tireFront, sB.tireFront)}
+    ${row('Rear Tire', sA.tireRear, sB.tireRear)}
+    ${row('Tire Model', sA.tireModel, sB.tireModel)}
+    <div class="delta-section-hdr">Handling</div>
+    ${row('Entry', sA.handling?.entry, sB.handling?.entry)}
+    ${row('Mid', sA.handling?.mid, sB.handling?.mid)}
+    ${row('Exit', sA.handling?.exit, sB.handling?.exit)}`;
+}
+
+// ── AI Page ───────────────────────────────────────────────
+function renderAiPage() {
+  // Populate track selects for trends
+  const trackSel = document.getElementById('trends-track-sel');
+  if (trackSel) {
+    const tracks = [...new Set(sessions.map(s => s.track).filter(Boolean))].sort();
+    trackSel.innerHTML = '<option value="">— Select Track —</option>' + tracks.map(t => `<option value="${t}">${t}</option>`).join('');
+  }
+  // Populate session select for autofill
+  const seSel = document.getElementById('autofill-session-sel');
+  if (seSel) {
+    seSel.innerHTML = '<option value="">— Select Session —</option>' + sessions.map((s, i) => {
+      const num = sessions.length - i;
+      return `<option value="${s.id}">#${num} — ${s.track} (${s.date})</option>`;
+    }).join('');
+  }
+}
+
+function aiLoading(containerId) {
+  document.getElementById(containerId).innerHTML = `
+    <div class="debrief-loading">
+      <div class="debrief-spinner"></div>
+      <div style="color:var(--muted);font-size:0.85rem;margin-top:12px;">Analysing...</div>
+    </div>`;
+}
+
+async function callGemini(prompt) {
+  const apiKey = localStorage.getItem('pitlog_apikey') || '';
+  if (!apiKey) throw new Error('No API key — add your Gemini key in Setup first.');
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 1000, temperature: 0.4 }
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error?.message || `API error ${response.status}`);
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+function renderAiResult(containerId, html) {
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function renderAiError(containerId, msg) {
+  document.getElementById(containerId).innerHTML = `<div class="debrief-error">⚠ ${msg}</div>`;
+}
+
+// AI Setup Advisor
+async function runAdvisor() {
+  const problem = document.getElementById('advisor-problem')?.value.trim();
+  if (!problem) { showToast('DESCRIBE THE PROBLEM FIRST'); return; }
+  aiLoading('advisor-result');
+
+  const fComp = document.getElementById('adv-fcomp')?.value;
+  const fReb  = document.getElementById('adv-freb')?.value;
+  const rComp = document.getElementById('adv-rcomp')?.value;
+  const rReb  = document.getElementById('adv-rreb')?.value;
+  const current = (fComp || fReb || rComp || rReb) ? `Current clicks — F.Comp: ${fComp||'?'}, F.Reb: ${fReb||'?'}, R.Comp: ${rComp||'?'}, R.Reb: ${rReb||'?'}` : '';
+
+  const prompt = `You are an expert motorsport suspension engineer. A driver describes this handling problem: "${problem}". ${current}
+
+Respond in raw JSON only (no markdown):
+{
+  "diagnosis": "1-2 sentence diagnosis of the root cause",
+  "changes": [
+    {"what": "Front Compression", "adjustment": "+2 clicks (stiffer)", "reason": "why"},
+    {"what": "Rear Rebound", "adjustment": "-1 click (softer)", "reason": "why"}
+  ],
+  "caution": "One thing to watch out for with these changes"
+}`;
+
+  try {
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    renderAiResult('advisor-result', `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Diagnosis</div>
+        <div class="debrief-text">${parsed.diagnosis}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Recommended Changes</div>
+        ${parsed.changes.map(c => `
+          <div class="debrief-item">
+            <span class="debrief-bullet">→</span>
+            <span><strong>${c.what}:</strong> ${c.adjustment} — ${c.reason}</span>
+          </div>`).join('')}
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">⚠ Caution</div>
+        <div class="debrief-text">${parsed.caution}</div>
+      </div>`);
+  } catch(e) { renderAiError('advisor-result', e.message); }
+}
+
+// AI Trend Analysis
+async function runTrends() {
+  const track = document.getElementById('trends-track-sel')?.value;
+  if (!track) { showToast('SELECT A TRACK FIRST'); return; }
+  const ss = sessions.filter(s => s.track === track).slice(0, 3);
+  if (ss.length < 2) { showToast('NEED AT LEAST 2 SESSIONS AT THIS TRACK'); return; }
+  aiLoading('trends-result');
+
+  const sessionSummaries = ss.map((s, i) => {
+    const num = sessions.length - sessions.indexOf(s);
+    return `Session #${num} (${s.date}): Lap=${s.laptime||'—'}, F.Comp=${s.suspension?.frontComp||'—'}, F.Reb=${s.suspension?.frontReb||'—'}, R.Comp=${s.suspension?.rearComp||'—'}, R.Reb=${s.suspension?.rearReb||'—'}, Entry=${s.handling?.entry||'—'}, Mid=${s.handling?.mid||'—'}, Exit=${s.handling?.exit||'—'}, Notes="${s.notes||''}"`;
+  }).join('\n');
+
+  const prompt = `You are an expert motorsport engineer. Analyse these ${ss.length} sessions at ${track} and identify trends:
+
+${sessionSummaries}
+
+Respond in raw JSON only (no markdown):
+{
+  "trend_summary": "2-3 sentence overview of how the car has evolved",
+  "whats_improving": "What aspect is getting better across sessions",
+  "persistent_issue": "Any problem that keeps appearing",
+  "next_direction": "Recommended direction for the next session at this track"
+}`;
+
+  try {
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    renderAiResult('trends-result', `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Trend Overview</div>
+        <div class="debrief-text">${parsed.trend_summary}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">What's Improving</div>
+        <div class="debrief-text">${parsed.whats_improving}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Persistent Issue</div>
+        <div class="debrief-text">${parsed.persistent_issue}</div>
+      </div>
+      <div class="debrief-section">
+        <div class="debrief-section-title">Next Session Direction</div>
+        <div class="debrief-text">${parsed.next_direction}</div>
+      </div>`);
+  } catch(e) { renderAiError('trends-result', e.message); }
+}
+
+// AI Auto-fill Changes
+async function runAutofill() {
+  const id = document.getElementById('autofill-session-sel')?.value;
+  if (!id) { showToast('SELECT A SESSION FIRST'); return; }
+  const s = sessions.find(x => x.id == id);
+  if (!s) return;
+  aiLoading('autofill-result');
+
+  const prompt = `Based on this race session data, write a concise "Changes for Next Session" note (2-4 bullet points, practical and specific):
+
+Track: ${s.track}, Lap: ${s.laptime||'—'}
+Handling: Entry=${s.handling?.entry||'—'}, Mid=${s.handling?.mid||'—'}, Exit=${s.handling?.exit||'—'}
+Coilovers: F.Comp=${s.suspension?.frontComp||'—'}, F.Reb=${s.suspension?.frontReb||'—'}, R.Comp=${s.suspension?.rearComp||'—'}, R.Reb=${s.suspension?.rearReb||'—'}
+Notes: ${s.notes||'none'}
+
+Respond in raw JSON only (no markdown):
+{"changes": ["change 1", "change 2", "change 3"]}`;
+
+  try {
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    const text = parsed.changes.map(c => `• ${c}`).join('\n');
+    _pendingAutofillId = s.id;
+    _pendingAutofillText = text;
+    renderAiResult('autofill-result', `
+      <div class="debrief-section">
+        <div class="debrief-section-title">Suggested Changes for Next Session</div>
+        ${parsed.changes.map(c => `<div class="debrief-item"><span class="debrief-bullet">→</span><span>${c}</span></div>`).join('')}
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="applyPendingAutofill()">APPLY TO SESSION</button>`);
+  } catch(e) { renderAiError('autofill-result', e.message); }
+}
+
+let _pendingAutofillId = null;
+let _pendingAutofillText = null;
+
+function applyAutofill(id, text) {
+  const s = sessions.find(x => x.id == id);
+  if (!s) { showToast('SESSION NOT FOUND'); return; }
+  s.changes = text;
+  localStorage.setItem('pitlog_sessions', JSON.stringify(sessions));
+  showToast('CHANGES APPLIED ✓');
+  haptic('success');
+}
+
+function applyPendingAutofill() {
+  if (!_pendingAutofillId || !_pendingAutofillText) return;
+  applyAutofill(_pendingAutofillId, _pendingAutofillText);
+}
+
+// ── Close modal when tapping backdrop
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModalDirect();
+});
+document.getElementById('debrief-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeDebrief();
+});
+
+loadAccentColor();
+loadTheme();
+
+// Init with today and populate dropdowns
+selectDay(calDate.getDate());
+populateTrackDropdown();
+populateCarProfileDropdown();
+populateTireFrontDropdown();
+populateTireRearDropdown();
+populateTireModelDropdown();
+applyClickSettings();
+// Prefill from last session on load
+if (sessions.length > 0) resetForm();
+renderHome();
+updateDials();
+populateEventSelect();
+</script>
+<!-- PWA Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('TrackLogger SW registered:', reg.scope))
+      .catch(err => console.warn('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
