@@ -1,7 +1,8 @@
 {
   "name": "TrackLogger — Race Setup",
   "short_name": "TrackLogger",
-  "description": "Mobile-first race car setup logging app for track day drivers.",
+  "id": "tracklogger-race-setup",
+  "description": "Mobile-first race car setup logging app for track day drivers. Log sessions, compare setups, and get AI debriefs.",
   "start_url": "race-setup-logger.html",
   "scope": ".",
   "display": "standalone",
@@ -10,6 +11,7 @@
   "background_color": "#0d0d0d",
   "theme_color": "#0d0d0d",
   "prefer_related_applications": false,
+  "lang": "en",
   "categories": ["sports", "utilities"],
   "icons": [
     {
@@ -71,6 +73,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot-home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home dashboard with session stats and personal bests"
+    },
+    {
+      "src": "screenshots/screenshot-log.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Log a new session with coilover visuals and weather auto-fill"
     }
   ],
   "shortcuts": [

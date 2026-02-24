@@ -2286,6 +2286,21 @@
   </div>
 
   <div class="card">
+    <div class="section-label">Install App</div>
+    <div id="setup-install-available" style="display:none;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">Install TrackLogger as a standalone app on your device — no browser bar, works offline.</p>
+      <button onclick="triggerInstall()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:#000;border:none;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.9rem;letter-spacing:2px;padding:14px;cursor:pointer;">
+        ⬇ INSTALL TRACKLOGGER
+      </button>
+    </div>
+    <div id="setup-install-unavailable">
+      <p style="font-size:0.8rem;color:var(--muted);line-height:1.6;">
+        <span id="setup-install-msg">Open this page in <strong style="color:var(--text);">Chrome on Android</strong> and the install prompt will appear here automatically.</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="section-label">Appearance</div>
     <div class="field" style="margin:0;">
       <label>Theme</label>
@@ -4586,6 +4601,11 @@ if (sessions.length > 0) resetForm();
 renderHome();
 updateDials();
 populateEventSelect();
+// If already running as installed PWA, update the install card
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+  const msg = document.getElementById('setup-install-msg');
+  if (msg) msg.innerHTML = '✓ <strong style="color:var(--accent)">TrackLogger is installed</strong> on your device.';
+}
 </script>
 <!-- PWA Service Worker + Install Prompt -->
 <script>
@@ -4612,15 +4632,27 @@ let _installPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   _installPrompt = e;
-  // Show an install button in the header if available
-  const btn = document.getElementById('pwa-install-btn');
-  if (btn) btn.style.display = 'flex';
+  // Show install buttons wherever they exist
+  const headerBtn = document.getElementById('pwa-install-btn');
+  if (headerBtn) headerBtn.style.display = 'flex';
+  // Show setup card install state
+  const avail = document.getElementById('setup-install-available');
+  const unavail = document.getElementById('setup-install-unavailable');
+  if (avail) avail.style.display = 'block';
+  if (unavail) unavail.style.display = 'none';
 });
 
 window.addEventListener('appinstalled', () => {
   _installPrompt = null;
-  const btn = document.getElementById('pwa-install-btn');
-  if (btn) btn.style.display = 'none';
+  const headerBtn = document.getElementById('pwa-install-btn');
+  if (headerBtn) headerBtn.style.display = 'none';
+  // Update setup card to show installed state
+  const avail = document.getElementById('setup-install-available');
+  const unavail = document.getElementById('setup-install-unavailable');
+  const msg = document.getElementById('setup-install-msg');
+  if (avail) avail.style.display = 'none';
+  if (unavail) unavail.style.display = 'block';
+  if (msg) msg.innerHTML = '✓ <strong style="color:var(--accent)">TrackLogger is installed</strong> on your device.';
   showToast('TRACKLOGGER INSTALLED ✓');
 });
 
