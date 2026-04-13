@@ -1,55 +1,45 @@
 // TrackLogger Service Worker
-// Cache name is set dynamically from the app's version meta tag.
-// To push an update: bump <meta name="app-version"> in race-setup-logger.html.
-// localStorage data is NEVER touched by the SW — updates are safe.
+// IMPORTANT: When you bump <meta name="app-version"> in the HTML,
+// also update CACHE_VERSION here to match. Both must stay in sync.
 
-const SHELL = 'race-setup-logger.html';
-let CACHE_NAME = 'tracklogger-v1'; // fallback, overwritten on install
+const CACHE_VERSION = '1.0.0';
+const CACHE_NAME = `tracklogger-${CACHE_VERSION}`;
 
-async function getVersionFromHTML(url) {
-  try {
-    const res = await fetch(url, { cache: 'no-store' });
-    const text = await res.text();
-    const match = text.match(/<meta name="app-version" content="([^"]+)"/);
-    return match ? match[1] : 'unknown';
-  } catch {
-    return 'unknown';
-  }
-}
+const CACHE_URLS = [
+  'race-setup-logger.html',
+  'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+];
 
-// ── Install ───────────────────────────────────────────────
+// ── Install: pre-cache app shell ──────────────────────────
 self.addEventListener('install', event => {
-  event.waitUntil((async () => {
-    const version = await getVersionFromHTML(SHELL);
-    CACHE_NAME = `tracklogger-${version}`;
-    const cache = await caches.open(CACHE_NAME);
-    await cache.addAll([
-      SHELL,
-      'manifest.json',
-      'icons/icon-192.png',
-      'icons/icon-512.png',
-    ]).catch(() => cache.add(SHELL));
-    await self.skipWaiting();
-  })());
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(CACHE_URLS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-// ── Activate: delete old caches ───────────────────────────
+// ── Activate: delete old caches, take control ─────────────
 self.addEventListener('activate', event => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(
-      keys
-        .filter(k => k.startsWith('tracklogger-') && k !== CACHE_NAME)
-        .map(k => caches.delete(k))
-    );
-    await self.clients.claim();
-    // Notify all open tabs that an update is available
-    const clients = await self.clients.matchAll({ type: 'window' });
-    clients.forEach(client => client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME }));
-  })());
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(k => k.startsWith('tracklogger-') && k !== CACHE_NAME)
+          .map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
+      .then(async () => {
+        // Tell open tabs an update landed
+        const clients = await self.clients.matchAll({ type: 'window' });
+        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION }));
+      })
+  );
 });
 
-// ── Fetch ─────────────────────────────────────────────────
+// ── Fetch: cache-first, network fallback ──────────────────
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -69,16 +59,18 @@ self.addEventListener('fetch', event => {
   // Network-first for Google Fonts
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(
-      fetch(request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(request, clone));
-        return res;
-      }).catch(() => caches.match(request))
+      fetch(request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(request, clone));
+          return res;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
 
-  // Cache-first for everything else
+  // Cache-first for everything else (HTML, icons, manifest)
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
@@ -88,7 +80,7 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(c => c.put(request, clone));
         return response;
       }).catch(() => {
-        if (request.mode === 'navigate') return caches.match(SHELL);
+        if (request.mode === 'navigate') return caches.match('race-setup-logger.html');
       });
     })
   );
