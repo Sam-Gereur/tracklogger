@@ -6,6 +6,8 @@
 <title>TrackLogger — Race Setup</title>
 
 <!-- PWA Manifest -->
+<!-- App version — bump this on every release to trigger SW cache refresh -->
+<meta name="app-version" content="1.0.0">
 <link rel="manifest" href="manifest.json">
 
 <!-- Theme & Status Bar -->
@@ -971,7 +973,32 @@
   /* Cheat Sheet page */
   #page-cheat { padding: 12px 0; }
 
-  .cheat-intro {
+  .cheat-section-header {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 4px 0 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+  }
+
+  .cheat-principle {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .cheat-principle:last-child { border-bottom: none; }
+  .cheat-principle strong { color: var(--text); }
+  .cheat-principle em { color: var(--accent); font-style: normal; font-weight: 600; }
+  .cheat-principle-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
     font-size: 0.75rem;
     color: var(--muted);
     padding: 0 12px 10px;
@@ -1162,7 +1189,158 @@
   }
 
   /* ── Theme Toggle ─────────────────────────────────────── */
-  .theme-toggle-row {
+  .sway-toggle {
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 58px;
+  }
+  .sway-toggle.on {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .sway-holes-wrap {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .sway-hole-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+  }
+  .sway-hole-btn.selected {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .sway-hole-btn.in-range {
+    background: color-mix(in srgb, var(--accent) 20%, var(--surface2));
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+    color: var(--text);
+  }
+  .sway-range-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .sway-selection-hint {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+    min-height: 18px;
+    transition: color 0.15s;
+  }
+  .sway-selection-hint.complete {
+    color: var(--accent);
+    font-style: normal;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* Wing Visualizer */
+  .wing-visualizer {
+    position: relative;
+    margin-top: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+  }
+  .wing-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .wing-drag-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    cursor: grab;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wing-drag-left {
+    left: 0;
+    width: 50%;
+    cursor: ns-resize;
+  }
+  .wing-drag-right {
+    right: 0;
+    width: 50%;
+    cursor: ns-resize;
+  }
+  .wing-drag-zone:active { cursor: grabbing; }
+  .wing-arc-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 14px 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .wing-arc-label-left { color: #4fc3f7; }
+  .wing-arc-label-right { color: #ff8a65; }
+  .wing-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .wing-ctrl-btn {
+    flex: 1;
+    padding: 10px 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .wing-ctrl-btn:active { background: var(--accent); color: #000; border-color: var(--accent); }
+  .wing-ctrl-val {
+    flex: 1.4;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
     display: flex;
     gap: 10px;
     margin-top: 6px;
@@ -1992,6 +2170,166 @@
   <!-- Coilovers — Front -->
   <!-- Coilovers — Rear -->
 
+  <!-- Sway Bars (shown only if enabled in settings) -->
+  <div class="card" id="sway-log-card" style="display:none;">
+    <div class="section-label">Sway Bars</div>
+    <div id="sway-log-front" style="display:none;">
+      <div class="coil-section-divider">FRONT</div>
+      <div class="field" style="margin-bottom:4px;">
+        <label>Select 2 hole positions</label>
+        <div class="sway-holes-wrap" id="sway-front-holes-btns"></div>
+        <div class="sway-range-label">
+          <span>◀ Stiffer</span>
+          <span>Softer ▶</span>
+        </div>
+        <div class="sway-selection-hint" id="sway-front-hint">Tap 2 holes to set bracket position</div>
+      </div>
+    </div>
+    <div id="sway-log-rear" style="display:none;">
+      <div class="coil-section-divider" style="margin-top:10px;">REAR</div>
+      <div class="field" style="margin-bottom:4px;">
+        <label>Select 2 hole positions</label>
+        <div class="sway-holes-wrap" id="sway-rear-holes-btns"></div>
+        <div class="sway-range-label">
+          <span>◀ Stiffer</span>
+          <span>Softer ▶</span>
+        </div>
+        <div class="sway-selection-hint" id="sway-rear-hint">Tap 2 holes to set bracket position</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rear Wing (shown only if enabled in settings) -->
+  <div class="card" id="wing-log-card" style="display:none;">
+    <div class="section-label">Rear Wing</div>
+    <div class="field" style="margin-bottom:0;">
+      <label>Angle of Attack</label>
+      <div class="wing-visualizer" id="wing-visualizer">
+        <!-- SVG wing profile -->
+        <svg class="wing-svg" id="wing-svg" viewBox="0 0 320 170" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Ground reference line -->
+          <line x1="20" y1="145" x2="300" y2="145" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- Wing group — rotates around chord center (160, 85) -->
+          <g id="wing-group" transform="rotate(0, 160, 85)">
+
+            <!--
+              Profile based on reference:
+              Chord: x=60 (LE) to x=260 (TE), chord center = (160, 85)
+              Max thickness ~28px at ~25% chord (x≈110)
+              Top surface: gentle convex arc, barely rises
+              Bottom surface: large cambered belly, drops significantly
+              TE: knife-sharp, both surfaces meet at a point
+            -->
+
+            <!-- Top surface: starts at LE (60,85), gentle hump peaking ~4px above chord, returns to TE (260,85) -->
+            <!-- Bottom surface: starts at LE, drops into deep belly ~24px below chord at 40% chord, returns to sharp TE -->
+            <path id="wing-path"
+              d="
+                M 60,85
+                C 65,71  90,63  115,65
+                C 140,67  170,70  200,74
+                C 222,77  242,80  260,85
+                C 242,86  222,88  200,91
+                C 175,96  148,103  120,107
+                C  95,110   68,104   60,85
+                Z
+              "
+              fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+
+            <!-- Inner surface shading — subtle fill to show thickness -->
+            <path
+              d="
+                M 65,80
+                C 85,68  112,64  135,67
+                C 158,69  185,73  210,77
+                C 230,80  247,82  258,85
+              "
+              fill="none" stroke="var(--accent)" stroke-width="0.7" opacity="0.2"/>
+
+            <!-- Chord line (LE to TE through center) -->
+            <line x1="60" y1="85" x2="260" y2="85"
+              stroke="var(--accent)" stroke-width="1"
+              stroke-dasharray="5,4" opacity="0.25"/>
+
+            <!-- Center pivot crosshair -->
+            <circle cx="160" cy="85" r="5" fill="none"
+              stroke="var(--accent)" stroke-width="1.5" opacity="0.7"/>
+            <line x1="155" y1="85" x2="165" y2="85"
+              stroke="var(--accent)" stroke-width="1.5" opacity="0.7"/>
+            <line x1="160" y1="80" x2="160" y2="90"
+              stroke="var(--accent)" stroke-width="1.5" opacity="0.7"/>
+
+            <!-- Leading edge dot -->
+            <circle cx="60" cy="85" r="3" fill="var(--accent)" opacity="0.6"/>
+
+            <!-- Trailing edge point -->
+            <circle cx="260" cy="85" r="2" fill="var(--accent)" opacity="0.4"/>
+
+          </g>
+
+          <!-- Angle arc indicator (around pivot 160,85) -->
+          <path id="wing-arc" d="" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0.5"/>
+
+          <!-- Pivot vertical reference line -->
+          <line x1="160" y1="45" x2="160" y2="145"
+            stroke="var(--border)" stroke-width="1"
+            stroke-dasharray="3,3" opacity="0.4"/>
+
+          <!-- Left / Right zone hints -->
+          <text x="88" y="158" text-anchor="middle"
+            font-family="'Barlow Condensed', sans-serif" font-size="8"
+            fill="var(--muted)" letter-spacing="0.5" opacity="0.7">↓ drag down</text>
+          <text x="232" y="158" text-anchor="middle"
+            font-family="'Barlow Condensed', sans-serif" font-size="8"
+            fill="var(--muted)" letter-spacing="0.5" opacity="0.7">↑ drag up</text>
+
+          <!-- Angle label -->
+          <text id="wing-angle-label" x="50" y="22" text-anchor="middle"
+            font-family="'Barlow Condensed', sans-serif" font-weight="900"
+            font-size="26" fill="var(--accent)" letter-spacing="1">0°</text>
+          <text x="50" y="35" text-anchor="middle"
+            font-family="'Barlow Condensed', sans-serif" font-weight="400"
+            font-size="9" fill="var(--muted)" letter-spacing="2">AoA</text>
+
+          <!-- Drag hint -->
+          <text id="wing-drag-hint" x="160" y="168" text-anchor="middle"
+            font-family="'Barlow Condensed', sans-serif" font-weight="700"
+            font-size="10" fill="var(--muted)" letter-spacing="1">LOW DOWNFORCE — LOW DRAG</text>
+
+        </svg>
+
+        <!-- Split drag zones: left half = drag down adds angle, right half = drag up adds angle -->
+        <div class="wing-drag-zone wing-drag-left" id="wing-drag-left"
+          ontouchstart="wingTouchStart(event,'left')"
+          ontouchmove="wingTouchMove(event)"
+          ontouchend="wingTouchEnd(event)"
+          onmousedown="wingMouseStart(event,'left')">
+        </div>
+        <div class="wing-drag-zone wing-drag-right" id="wing-drag-right"
+          ontouchstart="wingTouchStart(event,'right')"
+          ontouchmove="wingTouchMove(event)"
+          ontouchend="wingTouchEnd(event)"
+          onmousedown="wingMouseStart(event,'right')">
+        </div>
+        <!-- Arc labels -->
+        <div class="wing-arc-labels">
+          <span class="wing-arc-label-left">FLAT / LOW DRAG</span>
+          <span class="wing-arc-label-right">HIGH DOWNFORCE</span>
+        </div>
+      </div>
+      <!-- Fine control buttons -->
+      <div class="wing-controls">
+        <button class="wing-ctrl-btn" onclick="adjustWingAngle(-1)">−1°</button>
+        <button class="wing-ctrl-btn" onclick="adjustWingAngle(-5)">−5°</button>
+        <div class="wing-ctrl-val" id="wing-ctrl-display">0°</div>
+        <button class="wing-ctrl-btn" onclick="adjustWingAngle(5)">+5°</button>
+        <button class="wing-ctrl-btn" onclick="adjustWingAngle(1)">+1°</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Notes -->
   <div class="card">
     <div class="section-label">Driver Notes</div>
@@ -2133,6 +2471,9 @@
   </div>
 
   <div class="ai-panel" id="ai-cheat">
+
+    <!-- Coilovers cheat -->
+    <div class="cheat-section-header">COILOVERS</div>
     <div class="cheat-intro">Adjust clicks relative to your current baseline. ↑ = stiffer &nbsp;·&nbsp; ↓ = softer &nbsp;·&nbsp; ↔ = no change</div>
     <div class="cheat-wrap">
       <table class="cheat-table">
@@ -2150,6 +2491,98 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Sway bar cheat -->
+    <div class="cheat-section-header" style="margin-top:24px;">SWAY BARS</div>
+    <div class="cheat-intro">Move to a lower-numbered hole = stiffer (more resistance). Higher hole = softer (more body roll allowed). Front bar affects entry balance · Rear bar affects exit balance.</div>
+
+    <div class="cheat-wrap">
+      <table class="cheat-table">
+        <thead><tr><th>Situation / Problem</th><th>Front Bar</th><th>Rear Bar</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr class="cheat-group-us">
+            <td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — entry<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Car pushes wide on turn-in</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">Lower hole</span></td>
+            <td class="cheat-down">Softer ↓<br><span style="font-size:0.7rem;color:var(--muted);">Higher hole</span></td>
+            <td class="cheat-why">Softening front bar lets more weight transfer to outside front tyre on entry. Stiffening rear reduces rear roll, shifting balance forward.</td>
+          </tr>
+          <tr class="cheat-group-us">
+            <td class="cheat-situation"><span class="cheat-badge us">US</span>Understeer — mid-corner<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Can't hold line at apex</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">Lower hole</span></td>
+            <td class="cheat-neutral">↔<br><span style="font-size:0.7rem;color:var(--muted);">No change</span></td>
+            <td class="cheat-why">Reduces front roll stiffness, letting the front tyres load up more evenly through the corner and gain grip.</td>
+          </tr>
+          <tr class="cheat-group-os">
+            <td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — entry<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Rear steps out under braking / turn-in</span></td>
+            <td class="cheat-down">Softer ↓<br><span style="font-size:0.7rem;color:var(--muted);">Higher hole</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">Lower hole</span></td>
+            <td class="cheat-why">Stiffening the front bar transfers more load to the front axle on entry. Softening the rear reduces rear tyre unloading and keeps it planted.</td>
+          </tr>
+          <tr class="cheat-group-os">
+            <td class="cheat-situation"><span class="cheat-badge os">OS</span>Oversteer — exit<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Rear breaks loose on throttle</span></td>
+            <td class="cheat-neutral">↔<br><span style="font-size:0.7rem;color:var(--muted);">No change</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">Lower hole</span></td>
+            <td class="cheat-why">A softer rear bar allows more independent rear wheel movement under power, reducing the snap and giving the rear tyres more traction.</td>
+          </tr>
+          <tr>
+            <td class="cheat-situation"><span class="cheat-badge other">⚡</span>General understeer<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Car feels planted but understeers everywhere</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">1–2 holes</span></td>
+            <td class="cheat-down">Softer ↓<br><span style="font-size:0.7rem;color:var(--muted);">1 hole</span></td>
+            <td class="cheat-why">Classic front-bar-down / rear-bar-up adjustment to rotate balance toward oversteer.</td>
+          </tr>
+          <tr>
+            <td class="cheat-situation"><span class="cheat-badge other">⚡</span>General oversteer<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Car feels loose everywhere</span></td>
+            <td class="cheat-down">Softer ↓<br><span style="font-size:0.7rem;color:var(--muted);">1 hole</span>_2</td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">1 hole</span></td>
+            <td class="cheat-why">Classic front-bar-up / rear-bar-down to rotate balance toward understeer.</td>
+          </tr>
+          <tr>
+            <td class="cheat-situation"><span class="cheat-badge other">⚡</span>Bumpy / technical track<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Car skips or feels nervous</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">Lower hole</span></td>
+            <td class="cheat-up">Stiffer ↑<br><span style="font-size:0.7rem;color:var(--muted);">Lower hole</span></td>
+            <td class="cheat-why">Softer bars let each wheel move more independently over bumps, improving mechanical grip and stability on rough surfaces.</td>
+          </tr>
+          <tr>
+            <td class="cheat-situation"><span class="cheat-badge other">⚡</span>Smooth / fast flowing track<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">High-speed sweepers, flat surface</span></td>
+            <td class="cheat-down">Softer ↓<br><span style="font-size:0.7rem;color:var(--muted);">Higher hole</span></td>
+            <td class="cheat-down">Softer ↓<br><span style="font-size:0.7rem;color:var(--muted);">Higher hole</span></td>
+            <td class="cheat-why">Stiffer bars reduce body roll for a flatter platform, improving aero and giving a more predictable balance on smooth tarmac.</td>
+          </tr>
+          <tr>
+            <td class="cheat-situation"><span class="cheat-badge other">⚡</span>Car feels unpredictable<br><span style="font-size:0.7rem;color:var(--muted);font-weight:400;">Balance changes throughout corner</span></td>
+            <td class="cheat-neutral">↔<br><span style="font-size:0.7rem;color:var(--muted);">Start here</span></td>
+            <td class="cheat-neutral">↔<br><span style="font-size:0.7rem;color:var(--muted);">Start here</span></td>
+            <td class="cheat-why">Set both bars to mid-range and adjust coilovers first. Sway bars amplify existing balance issues — fix baseline damping before tuning bars.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Sway bar principles card -->
+    <div class="card" style="margin-top:16px;background:var(--surface2);">
+      <div class="section-label" style="margin-bottom:10px;">Key Principles</div>
+      <div class="cheat-principle">
+        <span class="cheat-principle-icon">📐</span>
+        <div><strong>Hole numbering</strong> — Hole 1 is stiffest (bar attaches closest to pivot). Higher numbers are softer. Your setup records the 2 attachment points: inner (chassis) and outer (arm).</div>
+      </div>
+      <div class="cheat-principle">
+        <span class="cheat-principle-icon">⚖️</span>
+        <div><strong>Front vs Rear</strong> — The bar with <em>more</em> stiffness relative to the other dominates balance. A stiffer front bar pushes toward understeer. A stiffer rear bar pushes toward oversteer.</div>
+      </div>
+      <div class="cheat-principle">
+        <span class="cheat-principle-icon">🔁</span>
+        <div><strong>Change one at a time</strong> — Always change front OR rear, never both in the same session. Establish a baseline, then tune from there.</div>
+      </div>
+      <div class="cheat-principle">
+        <span class="cheat-principle-icon">🌡️</span>
+        <div><strong>Tyre temps tell the story</strong> — After a session, compare inner vs outer tyre temps. Too much outer heat = excessive roll = consider stiffer bar. Uniform temps = good platform.</div>
+      </div>
+      <div class="cheat-principle">
+        <span class="cheat-principle-icon">🛞</span>
+        <div><strong>Sway bars vs coilovers</strong> — Coilovers affect both cornering and straight-line compliance. Sway bars <em>only</em> affect roll stiffness (not single-wheel bumps). Tune coilovers for ride quality, sway bars for balance.</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2279,6 +2712,45 @@
   </div>
 
   <div class="card">
+    <div class="section-label">Sway Bars</div>
+    <div class="field" style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <label style="margin-bottom:0;">Front Sway Bar</label>
+        <button class="sway-toggle" id="sway-toggle-front" onclick="toggleSwayBar('front')">OFF</button>
+      </div>
+      <div id="sway-front-holes-wrap" style="display:none;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="margin-bottom:0;flex:1;">Number of holes</label>
+          <input type="number" id="sway-front-holes" min="1" max="20" placeholder="e.g. 5" style="width:80px;text-align:center;" oninput="saveSwaySettings()">
+        </div>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--border);margin:4px 0 12px;"></div>
+    <div class="field" style="margin-bottom:4px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <label style="margin-bottom:0;">Rear Sway Bar</label>
+        <button class="sway-toggle" id="sway-toggle-rear" onclick="toggleSwayBar('rear')">OFF</button>
+      </div>
+      <div id="sway-rear-holes-wrap" style="display:none;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="margin-bottom:0;flex:1;">Number of holes</label>
+          <input type="number" id="sway-rear-holes" min="1" max="20" placeholder="e.g. 5" style="width:80px;text-align:center;" oninput="saveSwaySettings()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Rear Wing</div>
+    <div class="field" style="margin-bottom:4px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <label style="margin-bottom:0;">Rear Wing</label>
+        <button class="sway-toggle" id="wing-toggle" onclick="toggleWingSetting()">OFF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="section-label">Events / Weekends</div>
     <div id="setup-event-list">
       <div style="color:var(--muted);font-size:0.82rem;padding:8px 0;">No events yet.</div>
@@ -2297,6 +2769,10 @@
       <p style="font-size:0.8rem;color:var(--muted);line-height:1.6;">
         <span id="setup-install-msg">Open this page in <strong style="color:var(--text);">Chrome on Android</strong> and the install prompt will appear here automatically.</span>
       </p>
+    </div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.72rem;color:var(--muted);letter-spacing:1px;">VERSION</span>
+      <span id="app-version-display" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.8rem;color:var(--text);letter-spacing:1px;">—</span>
     </div>
   </div>
 
@@ -3053,6 +3529,19 @@ async function runDebrief() {
   document.getElementById('debrief-result').innerHTML = '';
 
   // Build session summary for the prompt
+  const swayFront = s.sway?.front;
+  const swayRear  = s.sway?.rear;
+  const swayFrontStr = swayFront
+    ? (swayFront.a && swayFront.b
+        ? (swayFront.a === swayFront.b ? `Hole ${swayFront.a} (both ends)` : `Holes ${swayFront.a} & ${swayFront.b}`)
+        : String(swayFront))
+    : null;
+  const swayRearStr = swayRear
+    ? (swayRear.a && swayRear.b
+        ? (swayRear.a === swayRear.b ? `Hole ${swayRear.a} (both ends)` : `Holes ${swayRear.a} & ${swayRear.b}`)
+        : String(swayRear))
+    : null;
+
   const sessionInfo = `
 Track: ${s.track || '—'}
 Date: ${s.date || '—'}
@@ -3067,7 +3556,7 @@ Track State: ${s.trackState || '—'}
 Front Compression: ${s.suspension?.frontComp || '—'} clicks
 Front Rebound: ${s.suspension?.frontReb || '—'} clicks
 Rear Compression: ${s.suspension?.rearComp || '—'} clicks
-Rear Rebound: ${s.suspension?.rearReb || '—'} clicks
+Rear Rebound: ${s.suspension?.rearReb || '—'} clicks${swayFrontStr ? `\nFront Sway Bar: ${swayFrontStr} (hole 1 = stiffest, higher = softer)` : ''}${swayRearStr ? `\nRear Sway Bar: ${swayRearStr} (hole 1 = stiffest, higher = softer)` : ''}${s.wingAngle !== undefined ? `\nRear Wing Angle of Attack: ${s.wingAngle}° (0° = flat/low drag, 45° = max downforce)` : ''}
 Handling — Entry: ${s.handling?.entry || '—'}
 Handling — Mid: ${s.handling?.mid || '—'}
 Handling — Exit: ${s.handling?.exit || '—'}
@@ -3075,7 +3564,14 @@ Driver Notes: ${s.notes || '—'}
 Changes Noted: ${s.changes || '—'}
   `.trim();
 
-  const prompt = `You are an expert motorsport engineer analyzing a race session debrief. Based on the session data below, provide a concise structured analysis.
+  const swayContext = (swayFrontStr || swayRearStr)
+    ? `\n\nNote on sway bars: Hole 1 is stiffest (arm closest to pivot). Higher hole numbers = softer. Front sway bar primarily affects entry balance; rear sway bar affects exit balance.`
+    : '';
+  const wingContext = s.wingAngle !== undefined
+    ? `\n\nNote on rear wing: Higher angle of attack increases downforce and drag. At 0° the wing is flat (low drag, low downforce). Typical track day setups run 5–20°.`
+    : '';
+
+  const prompt = `You are an expert motorsport engineer analyzing a race session debrief. Based on the session data below, provide a concise structured analysis.${swayContext}${wingContext}
 
 SESSION DATA:
 ${sessionInfo}
@@ -3085,7 +3581,7 @@ Respond in this exact JSON format (no markdown, no code blocks, just raw JSON):
   "summary": "2-3 sentence overall assessment of the session",
   "handling_analysis": "1-2 sentences interpreting the entry/mid/exit handling data and what it means for setup",
   "priority_changes": [
-    "Specific change 1 with exact click adjustment if possible",
+    "Specific change 1 with exact click adjustment or sway bar hole if possible",
     "Specific change 2",
     "Specific change 3"
   ],
@@ -3341,6 +3837,324 @@ function loadClickSettingsForm() {
   document.getElementById('s-r-comp-max').value = clickSettings.rComp;
   document.getElementById('s-r-reb-max').value  = clickSettings.rReb;
 }
+
+// ── Sway Bar Settings ─────────────────────────────────────
+let swaySettings = JSON.parse(localStorage.getItem('pitlog_sway') || '{"frontOn":false,"frontHoles":5,"rearOn":false,"rearHoles":5}');
+
+function saveSwaySettings() {
+  swaySettings.frontHoles = parseInt(document.getElementById('sway-front-holes')?.value) || 5;
+  swaySettings.rearHoles  = parseInt(document.getElementById('sway-rear-holes')?.value)  || 5;
+  localStorage.setItem('pitlog_sway', JSON.stringify(swaySettings));
+  renderSwayLogCard();
+}
+
+function toggleSwayBar(side) {
+  swaySettings[side + 'On'] = !swaySettings[side + 'On'];
+  const holes = parseInt(document.getElementById('sway-' + side + '-holes')?.value) || swaySettings[side + 'Holes'];
+  swaySettings[side + 'Holes'] = holes;
+  localStorage.setItem('pitlog_sway', JSON.stringify(swaySettings));
+  loadSwaySettingsForm();
+  renderSwayLogCard();
+}
+
+function loadSwaySettingsForm() {
+  ['front', 'rear'].forEach(side => {
+    const on = swaySettings[side + 'On'];
+    const btn = document.getElementById('sway-toggle-' + side);
+    const wrap = document.getElementById('sway-' + side + '-holes-wrap');
+    const input = document.getElementById('sway-' + side + '-holes');
+    if (btn)   { btn.textContent = on ? 'ON' : 'OFF'; btn.classList.toggle('on', on); }
+    if (wrap)  wrap.style.display = on ? 'block' : 'none';
+    if (input) input.value = swaySettings[side + 'Holes'] || '';
+  });
+}
+
+function renderSwayLogCard() {
+  const card = document.getElementById('sway-log-card');
+  if (!card) return;
+  const anyOn = swaySettings.frontOn || swaySettings.rearOn;
+  card.style.display = anyOn ? 'block' : 'none';
+
+  ['front', 'rear'].forEach(side => {
+    const on = swaySettings[side + 'On'];
+    const holes = parseInt(swaySettings[side + 'Holes']) || 5;
+    const wrap = document.getElementById('sway-log-' + side);
+    if (!wrap) return;
+    wrap.style.display = on ? 'block' : 'none';
+    if (!on) return;
+
+    const container = document.getElementById('sway-' + side + '-holes-btns');
+    if (!container) return;
+
+    // Preserve existing selections
+    const existing = container.dataset.selections ? JSON.parse(container.dataset.selections) : [];
+    container.innerHTML = '';
+
+    for (let i = 1; i <= holes; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.dataset.hole = i;
+      const isSelected = existing.includes(i);
+      btn.className = 'sway-hole-btn' + (isSelected ? ' selected' : '');
+      btn.onclick = () => swayHoleTap(side, i);
+      container.appendChild(btn);
+    }
+    updateSwayRangeHighlight(side, existing);
+    updateSwayHint(side, existing);
+  });
+}
+
+function swayHoleTap(side, hole) {
+  const container = document.getElementById('sway-' + side + '-holes-btns');
+  if (!container) return;
+  let sel = container.dataset.selections ? JSON.parse(container.dataset.selections) : [];
+
+  if (sel.length === 0) {
+    // First tap — pick first hole
+    sel = [hole];
+  } else if (sel.length === 1) {
+    // Second tap — pick second hole (same hole allowed)
+    sel = [sel[0], hole];
+  } else {
+    // Already 2 — replace the farthest one from this tap
+    const dist = sel.map(h => Math.abs(h - hole));
+    const replaceIdx = dist[0] >= dist[1] ? 0 : 1;
+    sel[replaceIdx] = hole;
+  }
+
+  container.dataset.selections = JSON.stringify(sel);
+
+  // Update button states
+  container.querySelectorAll('.sway-hole-btn').forEach(btn => {
+    const h = parseInt(btn.dataset.hole);
+    btn.classList.toggle('selected', sel.includes(h));
+  });
+
+  updateSwayRangeHighlight(side, sel);
+  updateSwayHint(side, sel);
+}
+
+function updateSwayRangeHighlight(side, sel) {
+  const container = document.getElementById('sway-' + side + '-holes-btns');
+  if (!container) {
+    return;
+  }
+  if (sel.length !== 2 || sel[0] === sel[1]) {
+    container.querySelectorAll('.sway-hole-btn').forEach(b => b.classList.remove('in-range'));
+    return;
+  }
+  const [lo, hi] = [Math.min(...sel), Math.max(...sel)];
+  container.querySelectorAll('.sway-hole-btn').forEach(btn => {
+    const h = parseInt(btn.dataset.hole);
+    btn.classList.toggle('in-range', h > lo && h < hi);
+  });
+}
+
+function updateSwayHint(side, sel) {
+  const hint = document.getElementById('sway-' + side + '-hint');
+  if (!hint) return;
+  if (sel.length === 0) {
+    hint.textContent = 'Tap 2 holes to set bracket position';
+    hint.classList.remove('complete');
+  } else if (sel.length === 1) {
+    hint.textContent = 'Tap 1 more hole (or same hole again)';
+    hint.classList.remove('complete');
+  } else if (sel[0] === sel[1]) {
+    hint.textContent = `Hole ${sel[0]} — both ends`;
+    hint.classList.add('complete');
+  } else {
+    const sorted = [...sel].sort((a,b) => a-b);
+    hint.textContent = `Holes ${sorted[0]} & ${sorted[1]} selected`;
+    hint.classList.add('complete');
+  }
+}
+
+function getSwayLogValues() {
+  const result = {};
+  ['front', 'rear'].forEach(side => {
+    if (!swaySettings[side + 'On']) return;
+    const c = document.getElementById('sway-' + side + '-holes-btns');
+    if (!c) return;
+    const sel = c.dataset.selections ? JSON.parse(c.dataset.selections) : [];
+    if (sel.length === 2) {
+      const sorted = [...sel].sort((a,b) => a-b);
+      result[side] = { a: sorted[0], b: sorted[1] };
+    } else {
+      result[side] = null;
+    }
+  });
+  return result;
+}
+
+function resetSwayLogForm() {
+  ['front', 'rear'].forEach(side => {
+    const c = document.getElementById('sway-' + side + '-holes-btns');
+    if (c) {
+      c.dataset.selections = '[]';
+      c.querySelectorAll('.sway-hole-btn').forEach(b => {
+        b.classList.remove('selected', 'in-range');
+      });
+      updateSwayHint(side, []);
+    }
+  });
+}
+
+function prefillSwayLogForm(session) {
+  if (!session?.sway) return;
+  ['front', 'rear'].forEach(side => {
+    const val = session.sway[side];
+    if (!val) return;
+    const c = document.getElementById('sway-' + side + '-holes-btns');
+    if (!c) return;
+    // Support both old single-value and new {a,b} format
+    const sel = (val.a && val.b) ? [val.a, val.b] : (val ? [parseInt(val)] : []);
+    c.dataset.selections = JSON.stringify(sel);
+    c.querySelectorAll('.sway-hole-btn').forEach(btn => {
+      const h = parseInt(btn.dataset.hole);
+      btn.classList.toggle('selected', sel.includes(h));
+    });
+    updateSwayRangeHighlight(side, sel);
+    updateSwayHint(side, sel);
+  });
+}
+
+// ── Rear Wing ─────────────────────────────────────────────
+let wingSettings = JSON.parse(localStorage.getItem('pitlog_wing') || '{"on":false}');
+let wingAngle = 0; // current session angle, 0–45°
+let _wingDragging = false;
+let _wingStartY = 0;
+let _wingStartAngle = 0;
+
+function toggleWingSetting() {
+  wingSettings.on = !wingSettings.on;
+  localStorage.setItem('pitlog_wing', JSON.stringify(wingSettings));
+  loadWingSettingsForm();
+  renderWingLogCard();
+}
+
+function loadWingSettingsForm() {
+  const btn = document.getElementById('wing-toggle');
+  if (btn) {
+    btn.textContent = wingSettings.on ? 'ON' : 'OFF';
+    btn.classList.toggle('on', wingSettings.on);
+  }
+}
+
+function renderWingLogCard() {
+  const card = document.getElementById('wing-log-card');
+  if (!card) return;
+  card.style.display = wingSettings.on ? 'block' : 'none';
+  if (wingSettings.on) updateWingSVG(wingAngle);
+}
+
+function setWingAngle(angle) {
+  wingAngle = Math.max(0, Math.min(45, Math.round(angle)));
+  updateWingSVG(wingAngle);
+}
+
+function adjustWingAngle(delta) {
+  setWingAngle(wingAngle + delta);
+  haptic('light');
+}
+
+function updateWingSVG(angle) {
+  const group = document.getElementById('wing-group');
+  const label = document.getElementById('wing-angle-label');
+  const ctrlDisplay = document.getElementById('wing-ctrl-display');
+  const arc = document.getElementById('wing-arc');
+  const dragHint = document.getElementById('wing-drag-hint');
+  if (!group) return;
+
+  // Rotate around chord center pivot (160, 85)
+  group.setAttribute('transform', `rotate(${-angle}, 160, 85)`);
+
+  if (label) label.textContent = angle + '°';
+  if (ctrlDisplay) ctrlDisplay.textContent = angle + '°';
+
+  // Draw arc from 0° to current angle around pivot
+  if (arc) {
+    if (angle > 1) {
+      const r = 42, cx = 160, cy = 85;
+      const x1 = cx + r;
+      const y1 = cy;
+      const endAngleRad = -(angle * Math.PI / 180);
+      const x2 = cx + r * Math.cos(endAngleRad);
+      const y2 = cy + r * Math.sin(endAngleRad);
+      const largeArc = angle > 180 ? 1 : 0;
+      arc.setAttribute('d', `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 0 ${x2} ${y2}`);
+    } else {
+      arc.setAttribute('d', '');
+    }
+  }
+
+  // Color hint based on angle zone
+  if (dragHint) {
+    if (angle <= 10) {
+      dragHint.textContent = 'LOW DOWNFORCE — LOW DRAG';
+      dragHint.setAttribute('fill', '#4fc3f7');
+    } else if (angle <= 25) {
+      dragHint.textContent = 'MEDIUM DOWNFORCE — MEDIUM DRAG';
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e8ff00';
+      dragHint.setAttribute('fill', accent);
+    } else {
+      dragHint.textContent = 'HIGH DOWNFORCE — HIGH DRAG';
+      dragHint.setAttribute('fill', '#ff8a65');
+    }
+  }
+}
+
+// ── Wing drag interaction ─────────────────────────────────
+// Left side of visualizer: drag DOWN = more angle (pushing leading edge side up)
+// Right side: drag UP = more angle (pushing trailing edge side up)
+let _wingDragSide = 'right';
+
+function wingTouchStart(e, side) {
+  e.preventDefault();
+  _wingDragging = true;
+  _wingDragSide = side || 'right';
+  _wingStartY = e.touches[0].clientY;
+  _wingStartAngle = wingAngle;
+}
+function wingTouchMove(e) {
+  if (!_wingDragging) return;
+  e.preventDefault();
+  const dy = e.touches[0].clientY - _wingStartY;
+  const delta = _wingDragSide === 'left' ? dy / 2.5 : -dy / 2.5;
+  setWingAngle(_wingStartAngle + delta);
+}
+function wingTouchEnd(e) { _wingDragging = false; haptic('light'); }
+
+function wingMouseStart(e, side) {
+  _wingDragging = true;
+  _wingDragSide = side || 'right';
+  _wingStartY = e.clientY;
+  _wingStartAngle = wingAngle;
+  const onMove = ev => {
+    const dy = ev.clientY - _wingStartY;
+    const delta = _wingDragSide === 'left' ? dy / 2.5 : -dy / 2.5;
+    setWingAngle(_wingStartAngle + delta);
+  };
+  const onUp = () => {
+    _wingDragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function resetWingLogForm() {
+  wingAngle = 0;
+  updateWingSVG(0);
+}
+
+function prefillWingLogForm(session) {
+  if (session?.wingAngle !== undefined) {
+    wingAngle = session.wingAngle;
+    updateWingSVG(wingAngle);
+  }
+}
+
 function saveProfile() {
   const name = document.getElementById('p-name')?.value.trim();
   if (!name) { alert('Please enter a profile name.'); return; }
@@ -3386,15 +4200,6 @@ function editProfile(id) {
   document.getElementById('s-profile-form-title').textContent = 'EDIT PROFILE';
   document.getElementById('p-cancel-btn').style.display = 'block';
   setTimeout(() => document.getElementById('s-profile-form').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-}
-
-function deleteProfile(id) {
-  if (!confirm('Delete this car profile?')) return;
-  carProfiles = carProfiles.filter(p => p.id !== id);
-  localStorage.setItem('pitlog_profiles', JSON.stringify(carProfiles));
-  if (editingProfileId === id) { clearProfileForm(); editingProfileId = null; }
-  renderProfileList();
-  populateCarProfileDropdown();
 }
 
 function cancelProfileEdit() {
@@ -3606,6 +4411,8 @@ function loadSetupForm() {
   renderTireModelList();
   renderProfileList();
   loadClickSettingsForm();
+  loadSwaySettingsForm();
+  loadWingSettingsForm();
   const saved = localStorage.getItem('pitlog_accent');
   if (saved) { document.getElementById('accent-color-picker').value = saved; previewAccent(saved); }
   loadApiKeyForm();
@@ -3666,6 +4473,8 @@ function saveSession() {
       rearSpring: g('r-spring'),
       rearRH: g('r-rh'),
     },
+    sway: getSwayLogValues(),
+    wingAngle: wingSettings.on ? wingAngle : undefined,
     notes: g('notes'),
     changes: g('changes'),
     handling: {
@@ -3741,6 +4550,10 @@ function resetForm() {
   setSlider('r-comp', 'r-comp-val', clickSettings.rComp);
   setSlider('r-reb',  'r-reb-val',  clickSettings.rReb);
   updateDials();
+  resetSwayLogForm();
+  renderSwayLogCard();
+  resetWingLogForm();
+  renderWingLogCard();
 }
 
 function renderHistory() {
@@ -3875,6 +4688,10 @@ function openModal(id) {
     ${row('Front Rebound', s.suspension?.frontReb ? s.suspension.frontReb + ' clicks' : '')}
     ${row('Rear Compression', s.suspension?.rearComp ? s.suspension.rearComp + ' clicks' : '')}
     ${row('Rear Rebound', s.suspension?.rearReb ? s.suspension.rearReb + ' clicks' : '')}
+    ${s.sway?.front || s.sway?.rear ? sec('Sway Bars') : ''}
+    ${s.sway?.front ? row('Front Sway Bar', s.sway.front.a && s.sway.front.b ? (s.sway.front.a === s.sway.front.b ? `Hole ${s.sway.front.a} — both ends` : `Holes ${s.sway.front.a} & ${s.sway.front.b}`) : 'Hole ' + s.sway.front) : ''}
+    ${s.sway?.rear  ? row('Rear Sway Bar',  s.sway.rear.a  && s.sway.rear.b  ? (s.sway.rear.a  === s.sway.rear.b  ? `Hole ${s.sway.rear.a} — both ends`  : `Holes ${s.sway.rear.a} & ${s.sway.rear.b}`)   : 'Hole ' + s.sway.rear)  : ''}
+    ${s.wingAngle !== undefined ? sec('Rear Wing') + row('Angle of Attack', s.wingAngle + '°') : ''}
     ${s.notes ? sec('Driver Notes') + row('Feedback', s.notes) : ''}
     ${s.handling?.entry || s.handling?.mid || s.handling?.exit ? sec('Car Handling') + row('Entry', s.handling.entry) + row('Mid', s.handling.mid) + row('Exit', s.handling.exit) : ''}
     ${s.changes ? row('Changes for Next', s.changes) : ''}
@@ -4601,6 +5418,13 @@ if (sessions.length > 0) resetForm();
 renderHome();
 updateDials();
 populateEventSelect();
+renderSwayLogCard();
+loadWingSettingsForm();
+renderWingLogCard();
+// Display app version in settings
+const _versionMeta = document.querySelector('meta[name="app-version"]');
+const _versionEl = document.getElementById('app-version-display');
+if (_versionMeta && _versionEl) _versionEl.textContent = 'v' + _versionMeta.getAttribute('content');
 // If already running as installed PWA, update the install card
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
   const msg = document.getElementById('setup-install-msg');
@@ -4614,17 +5438,55 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
       .then(reg => {
         console.log('TrackLogger SW registered, scope:', reg.scope);
+        // Detect when a new SW is installing (new version pushed)
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              showToast('UPDATE AVAILABLE — RELOAD TO APPLY');
+              showUpdateBanner();
             }
           });
         });
+        // Check for waiting SW on load (update was downloaded last visit)
+        if (reg.waiting) showUpdateBanner();
       })
       .catch(err => console.warn('SW registration failed:', err));
+
+    // Listen for SW_UPDATED message from the new service worker
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data?.type === 'SW_UPDATED') showUpdateBanner();
+    });
   });
+}
+
+function showUpdateBanner() {
+  // Don't show twice
+  if (document.getElementById('update-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'update-banner';
+  banner.style.cssText = `
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #000;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+    font-size: 0.8rem; letter-spacing: 2px;
+    padding: 12px 20px; border-radius: 8px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 9999; white-space: nowrap;
+  `;
+  banner.innerHTML = `
+    <span>🔄 UPDATE AVAILABLE</span>
+    <button onclick="location.reload()" style="
+      background:#000; color:var(--accent); border:none; border-radius:4px;
+      font-family:'Barlow Condensed',sans-serif; font-weight:900;
+      font-size:0.75rem; letter-spacing:2px; padding:6px 12px; cursor:pointer;
+    ">RELOAD</button>
+    <button onclick="this.parentElement.remove()" style="
+      background:transparent; border:none; color:#000;
+      font-size:1rem; cursor:pointer; padding:0 2px; line-height:1;
+    ">✕</button>
+  `;
+  document.body.appendChild(banner);
 }
 
 // Capture the install prompt so we can trigger it from a button

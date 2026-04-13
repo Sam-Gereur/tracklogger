@@ -1,36 +1,61 @@
-// TrackLogger Service Worker v3
-const CACHE_NAME = 'tracklogger-v3';
+// TrackLogger Service Worker
+// Cache name is set dynamically from the app's version meta tag.
+// To push an update: bump <meta name="app-version"> in race-setup-logger.html.
+// localStorage data is NEVER touched by the SW — updates are safe.
 
-const CACHE_URLS = [
-  'race-setup-logger.html',
-  'manifest.json',
-  'icons/icon-192.png',
-  'icons/icon-512.png',
-];
+const SHELL = 'race-setup-logger.html';
+let CACHE_NAME = 'tracklogger-v1'; // fallback, overwritten on install
 
+async function getVersionFromHTML(url) {
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
+    const text = await res.text();
+    const match = text.match(/<meta name="app-version" content="([^"]+)"/);
+    return match ? match[1] : 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+// ── Install ───────────────────────────────────────────────
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(CACHE_URLS))
-  );
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const version = await getVersionFromHTML(SHELL);
+    CACHE_NAME = `tracklogger-${version}`;
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll([
+      SHELL,
+      'manifest.json',
+      'icons/icon-192.png',
+      'icons/icon-512.png',
+    ]).catch(() => cache.add(SHELL));
+    await self.skipWaiting();
+  })());
 });
 
+// ── Activate: delete old caches ───────────────────────────
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter(k => k.startsWith('tracklogger-') && k !== CACHE_NAME)
+        .map(k => caches.delete(k))
+    );
+    await self.clients.claim();
+    // Notify all open tabs that an update is available
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach(client => client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME }));
+  })());
 });
 
+// ── Fetch ─────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
   const { request } = event;
   if (request.method !== 'GET') return;
-
   const url = new URL(request.url);
 
-  // Always use network for weather API
+  // Always network for weather API
   if (url.hostname === 'api.open-meteo.com') {
     event.respondWith(
       fetch(request).catch(() =>
@@ -63,9 +88,7 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE_NAME).then(c => c.put(request, clone));
         return response;
       }).catch(() => {
-        if (request.mode === 'navigate') {
-          return caches.match('race-setup-logger.html');
-        }
+        if (request.mode === 'navigate') return caches.match(SHELL);
       });
     })
   );
